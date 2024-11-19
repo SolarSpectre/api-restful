@@ -3,8 +3,8 @@ import morgan from 'morgan';
 import fileUpload from 'express-fileupload';
 import cors from 'cors';
 
-import userRoutes from './routes/user_routes.js';
-import communityRoutes from './routes/community_routes.js';
+import userRoutes from './routers/user_routes.js';
+import communityRoutes from './routers/communities_routes.js';
 
 const app = express();
 
