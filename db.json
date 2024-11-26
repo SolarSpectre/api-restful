@@ -1,5 +1,18 @@
 {
-    "users": [],
-    "communities": []
-  }
-  
+  "users": [
+    {
+      "id": "7d3a5e4b-03c7-4923-ac86-86817a708b71",
+      "password": "$2b$10$J0pHI9f7xVv3mN/ALPkwbO5VTkQxhC2eQt7CkvXBpynaEqDRVr8Mm",
+      "username": "joseph",
+      "name": "joseph"
+    }
+  ],
+  "communities": [
+    {
+      "id": "f10c5729-bd83-432a-87e9-f9c33459e1e0",
+      "carrera": "Tecnologia en Desarrollo de Software",
+      "semestres": 5,
+      "descripcion": "Desarrollo de aplicaciones web y móviles con herramientas modernas y frameworks actuales para front-end y back-end."
+    }
+  ]
+}

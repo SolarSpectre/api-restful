@@ -4,7 +4,7 @@ const userModel = {
 
 
     async registerUserModel (newUser) {
-        const url = "http://localhost:4000/users"
+        const url = "http://localhost:3000/users"
         const peticion = await fetch(url,{
             method:'POST',
             body:JSON.stringify(newUser),
@@ -16,7 +16,7 @@ const userModel = {
 
 
     async loginUserModel(username,password) {
-        const response = await fetch(`http://localhost:4000/users`)
+        const response = await fetch(`http://localhost:3000/users`)
         const users = await response.json()
         const user = users.find(user => user.username === username)
         if (!user) {
