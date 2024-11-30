@@ -7,7 +7,7 @@
     "start": "node src/index.js",
     "dev": "node --watch src/index.js",
     "bdd": "npx json-server db.json",
-    "test": "mocha"
+    "test": "mocha test --require chai/register-expect.js "
   },
   "keywords": [],
   "author": "",
@@ -27,6 +27,7 @@
   },
   "devDependencies": {
     "chai": "^5.1.2",
+    "chai-http": "^5.1.1",
     "mocha": "^10.8.2",
     "supertest": "^7.0.0"
   }
