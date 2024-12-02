@@ -13,6 +13,11 @@
       "carrera": "Tecnologia en Desarrollo de Software",
       "semestres": 5,
       "descripcion": "Desarrollo de aplicaciones web y móviles con herramientas modernas y frameworks actuales para front-end y back-end."
+    },
+    {
+      "id": "4185b5d0-6548-4c7f-8da4-7c34bcb19180",
+      "name": "Comunidad de Prueba",
+      "descripcion": "Una descripción de prueba"
     }
   ]
 }
