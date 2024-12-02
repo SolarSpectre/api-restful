@@ -5,6 +5,13 @@
       "password": "$2b$10$J0pHI9f7xVv3mN/ALPkwbO5VTkQxhC2eQt7CkvXBpynaEqDRVr8Mm",
       "username": "joseph",
       "name": "joseph"
+    },
+    {
+      "id": "34a437e3-a90d-4fab-bc74-573cb7ec357b",
+      "password": "$2b$10$UKTTjo9nwXp50Unfe0jBGOzj8m40HaLxvSVAJbj8lRqnNgD7g1CYC",
+      "username": "test_user",
+      "imagen": "https://res.cloudinary.com/dya9y7pca/image/upload/v1733160186/users/gxl45po81rfbepmyyrza.jpg",
+      "public_id": "users/gxl45po81rfbepmyyrza"
     }
   ],
   "communities": [
