@@ -2,10 +2,17 @@ import express from 'express';
 import morgan from 'morgan';
 import fileUpload from 'express-fileupload';
 import cors from 'cors';
-
+import cloudinary from 'cloudinary';
+import dotenv from 'dotenv'
 import userRoutes from './routers/user_routes.js';
 import communityRoutes from './routers/communities_routes.js';
 
+dotenv.config()
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET
+})
 const app = express();
 
 // Middleware
