@@ -15,7 +15,7 @@ describe('Pruebas /api/communities', () => {
     };
 
     const res = await request(app)
-      .post("/api/users/login")
+      .post("/api/students/login")
       .send(loginData);
 
     expect(res.statusCode).to.equal(200);
