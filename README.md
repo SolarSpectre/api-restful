@@ -4,10 +4,15 @@ Proyecto API Restful EXAMEN B1
 Este proyecto implementa un sistema de CRUD (Crear, Leer, Actualizar y Eliminar) para gestionar la información relevante, tanto de las carreras en común que presentan las universidades como de los estudiantes. La aplicación está diseñada para ser desplegada en un entorno backend, facilitando la administración y manejo de datos predefinidos.
 
 - Características Principales
+
 Gestión de comunidades y estudiantes: Crear, visualizar, editar y eliminar tanto comunidades respecto de sus carreras como estudiantes dentro del sistema.
+
 Base de Datos: Sistema relacional para almacenar y organizar la información.
+
 API REST: Exposición de endpoints para operaciones CRUD.
+
 Despliegue: Preparado para implementación en plataformas de alojamiento como Render, Vercel, entre otras.
+
 Estructura del proyecto
 
 ![image](https://github.com/user-attachments/assets/8a71c12a-c936-4afe-b3ae-6fd06b0b68c5)
@@ -31,6 +36,6 @@ Express.js, Librerias NPM, Render, Beeceptor, Git y GitHub, Cloudinary e Imsomni
 
 3.5. URL_BDD_USERS
 
-Autores
+- Autores
 
 Marlon Nicolalde, Joseph Caza, Michelle Suárez e Isaac Quinapallo
