@@ -4,7 +4,7 @@ import fileUpload from 'express-fileupload';
 import cors from 'cors';
 import cloudinary from 'cloudinary';
 import dotenv from 'dotenv'
-import userRoutes from './routers/user_routes.js';
+import studentRoutes from './routers/student_routes.js';
 import communityRoutes from './routers/communities_routes.js';
 
 dotenv.config()
@@ -28,7 +28,7 @@ app.use(fileUpload({
 app.set('port', process.env.PORT || 4000);
 
 // Routes
-app.use('/api/users', userRoutes);
+app.use('/api/students', studentRoutes);
 app.use('/api/communities', communityRoutes);
 
 export default app;

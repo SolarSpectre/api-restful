@@ -1,14 +1,14 @@
 const studentCommunityModel = {
 
     async getAllCommunities() {
-        const response = await fetch("http://localhost:3000/communities");
+        const response = await fetch("https://communities.free.beeceptor.com/communities");
         const communities = await response.json();
         console.log(communities);
         return communities;
     },
 
     async getCommunityById(communityId) {
-        const response = await fetch(`http://localhost:3000/communities/${communityId}`);
+        const response = await fetch(`https://communities.free.beeceptor.com/communities/${communityId}`);
         if (!response.ok) {
             return { error: "Comunidad no encontrada" };
         }
@@ -17,7 +17,7 @@ const studentCommunityModel = {
     },
 
     async createCommunity(newCommunity) {
-        const url = "http://localhost:3000/communities";
+        const url = "https://communities.free.beeceptor.com/communities";
         const response = await fetch(url, {
             method: 'POST',
             body: JSON.stringify(newCommunity),
@@ -28,7 +28,7 @@ const studentCommunityModel = {
     },
 
     async updateCommunity(communityId, updatedCommunity) {
-        const url = `http://localhost:3000/communities/${communityId}`;
+        const url = `https://communities.free.beeceptor.com/communities/${communityId}`;
         const response = await fetch(url);
         if (!response.ok) {
             return { error: "Comunidad no encontrada" };
@@ -44,7 +44,7 @@ const studentCommunityModel = {
     },
 
     async deleteCommunity(communityId) {
-        const url = `http://localhost:3000/communities/${communityId}`;
+        const url = `https://communities.free.beeceptor.com/communities/${communityId}`;
         const response = await fetch(url);
         if (!response.ok) {
             return { error: "Comunidad no encontrada" };
@@ -56,27 +56,6 @@ const studentCommunityModel = {
             return { msg: "Comunidad eliminada correctamente" };
         }
     },
-
-    async addStudentToCommunity(communityId, student) {
-        const url = `http://localhost:3000/communities/${communityId}/students`;
-        const response = await fetch(url, {
-            method: 'POST',
-            body: JSON.stringify(student),
-            headers: { 'Content-Type': 'application/json' }
-        });
-        const data = await response.json();
-        return data;
-    },
-
-    async getStudentsInCommunity(communityId) {
-        const url = `http://localhost:3000/communities/${communityId}/students`;
-        const response = await fetch(url);
-        if (!response.ok) {
-            return { error: "Estudiantes no encontrados" };
-        }
-        const students = await response.json();
-        return students;
-    }
 };
 
 export default studentCommunityModel;
