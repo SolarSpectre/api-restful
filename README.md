@@ -20,11 +20,17 @@ Express.js, Librerias NPM, Render, Beeceptor, Git y GitHub, Cloudinary e Imsomni
 1. Clonar el Repositorio
 2. Instalar dependencias: npm install
 3. Configurar el Entorno: Crear un archivo .env con las siguientes variables:
+
 3.1. CLOUDINARY_CLOUD_NAME
+
 3.2. CLOUDINARY_API_KEY
+
 3.3. CLOUDINARY_API_SECRET
+
 3.4. URL_BDD_TOURS
+
 3.5. URL_BDD_USERS
 
 Autores
+
 Marlon Nicolalde, Joseph Caza, Michelle Suárez e Isaac Quinapallo
