@@ -4,7 +4,7 @@ const studentModel = {
 
 
     async registerStudentModel (newUser) {
-        const url = "https://communities.free.beeceptor.com/students"
+        const url = "https://community.free.beeceptor.com/students"
         const peticion = await fetch(url,{
             method:'POST',
             body:JSON.stringify(newUser),
@@ -15,7 +15,7 @@ const studentModel = {
     },
 
     async loginStudentModel(username,password) {
-        const response = await fetch(`https://communities.free.beeceptor.com/students`)
+        const response = await fetch(`https://community.free.beeceptor.com/students`)
         const users = await response.json()
         const user = users.find(user => user.username === username)
         if (!user) {
@@ -29,7 +29,7 @@ const studentModel = {
         }
     },
     async updateStudent_model(studentID, updateStudent_model){
-        const url=`https://communities.free.beeceptor.com/students/${studentID}`
+        const url=`https://community.free.beeceptor.com/students/${studentID}`
         const peticion=await fetch(url, {
             method: "PUT",
             body: JSON.stringify(updateStudent_model),
@@ -39,7 +39,7 @@ const studentModel = {
         return data
     },
     async deleteStudent_model(studentID){
-        const url=`https://communities.free.beeceptor.com/students/${studentID}`
+        const url=`https://community.free.beeceptor.com/students/${studentID}`
         const peticion=await fetch (url, {
             method: "DELETE"
         })
@@ -48,7 +48,7 @@ const studentModel = {
     },
 
     async getStudent_ID(studentID){
-        const peticion=await fetch (`https://communities.free.beeceptor.com/students/${studentID}`)
+        const peticion=await fetch (`https://community.free.beeceptor.com/students/${studentID}`)
         const data=await peticion.json()
         return data
     }

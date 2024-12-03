@@ -1,13 +1,13 @@
 const privateCommunityModel = {
 
     async getAllPrivateCommunities() {
-        const response = await fetch("https://communities.free.beeceptor.com/private-communities");
+        const response = await fetch("https://community.free.beeceptor.com/private-communities");
         const communities = await response.json();
         return communities;
     },
 
     async getPrivateCommunityById(communityId) {
-        const response = await fetch(`https://communities.free.beeceptor.com/private-communities/${communityId}`);
+        const response = await fetch(`https://community.free.beeceptor.com/private-communities/${communityId}`);
         if (!response.ok) {
             return { error: "Comunidad privada no encontrada" };
         }
@@ -16,7 +16,7 @@ const privateCommunityModel = {
     },
 
     async createPrivateCommunity(newCommunity) {
-        const url = "https://communities.free.beeceptor.com/private-communities";
+        const url = "https://community.free.beeceptor.com/private-communities";
         const response = await fetch(url, {
             method: 'POST',
             body: JSON.stringify(newCommunity),
@@ -27,7 +27,7 @@ const privateCommunityModel = {
     },
 
     async updatePrivateCommunity(communityId, updatedCommunity) {
-        const url = `https://communities.free.beeceptor.com/private-communities/${communityId}`;
+        const url = `https://community.free.beeceptor.com/private-communities/${communityId}`;
         const response = await fetch(url);
         if (!response.ok) {
             return { error: "Comunidad privada no encontrada" };
@@ -43,7 +43,7 @@ const privateCommunityModel = {
     },
 
     async deletePrivateCommunity(communityId) {
-        const url = `https://communities.free.beeceptor.com/private-communities/${communityId}`;
+        const url = `https://community.free.beeceptor.com/private-communities/${communityId}`;
         const response = await fetch(url);
         if (!response.ok) {
             return { error: "Comunidad privada no encontrada" };
