@@ -1,34 +1,31 @@
-import express from 'express';
-import morgan from 'morgan';
-import fileUpload from 'express-fileupload';
-import cors from 'cors';
-import cloudinary from 'cloudinary';
+// Requerir los módulos
+import express from 'express'
 import dotenv from 'dotenv'
-import studentRoutes from './routers/student_routes.js';
-import communityRoutes from './routers/communities_routes.js';
-
+import cors from 'cors';
+import routerEstudiantes from './routers/estudiante_routes.js';
+// Inicializaciones
+const app = express()
 dotenv.config()
-cloudinary.config({
-    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-    api_key: process.env.CLOUDINARY_API_KEY,
-    api_secret: process.env.CLOUDINARY_API_SECRET
-})
-const app = express();
 
-// Middleware
-app.use(morgan('dev'));
-app.use(express.json());
-app.use(cors());
-app.use(fileUpload({
-    useTempFiles: true,
-    tempFileDir: './uploads',
-}));
+// Configuraciones 
+app.set('port',process.env.port || 3000)
+app.use(cors())
 
-// Settings
-app.set('port', process.env.PORT || 4000);
+// Middlewares 
+app.use(express.json())
 
-// Routes
-app.use('/api/students', studentRoutes);
-app.use('/api/communities', communityRoutes);
 
-export default app;
+// Variables globales
+
+// Rutas 
+app.use('/api',routerEstudiantes)
+
+
+
+// Manejo de una ruta que no sea encontrada
+app.use((req,res)=>res.status(404).send("Endpoint no encontrado - 404"))
+
+
+
+// Exportar la instancia de express por medio de app
+export default  app
