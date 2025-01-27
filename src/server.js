@@ -3,6 +3,7 @@ import express from 'express'
 import dotenv from 'dotenv'
 import cors from 'cors';
 import routerEstudiantes from './routers/estudiante_routes.js';
+import routerAdmin from './routers/administrador_routes.js';
 // Inicializaciones
 const app = express()
 dotenv.config()
@@ -19,6 +20,7 @@ app.use(express.json())
 
 // Rutas 
 app.use('/api',routerEstudiantes)
+app.use('/api',routerAdmin)
 
 
 
