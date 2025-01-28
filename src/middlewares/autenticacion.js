@@ -1,52 +1,48 @@
-
-// Importar JWT y el Modelo
-import jwt from 'jsonwebtoken'
-import Estudiante from '../models/Estudiante.js'
-import Administrador from '../models/Administrador.js'
-
-
+// Importar JWT y los Modelos
+import jwt from 'jsonwebtoken';
+import Estudiante from '../models/Estudiante.js';
+import Administrador from '../models/Administrador.js';
 
 // Método para proteger rutas
-const verificarAutenticacion = async (req,res,next)=>{
+const verificarAutenticacion = async (req, res, next) => {
+  // Verificar si se envió el token en los headers
+  if (!req.headers.authorization) {
+    return res.status(401).json({ msg: "Lo sentimos, debes proporcionar un token" });
+  }
 
-    // Validación si se está enviando el token
-if(!req.headers.authorization) return res.status(404).json({msg:"Lo sentimos, debes proprocionar un token"})  
+  // Extraer el token de los headers
+  const { authorization } = req.headers;
 
-    // Desestructurar el token pero del headers
-    const {authorization} = req.headers
+  try {
+    // Verificar y decodificar el token
+    const token = authorization.split(' ')[1]; // Extraer el token después de "Bearer"
+    const { id, rol } = jwt.verify(token, process.env.JWT_SECRET); // Decodificar el token usando la clave secreta
 
-
-
-    // Capturar errores
-    try {
-        // verificar el token recuperado con el almacenado 
-        const {id,rol} = jwt.verify(authorization.split(' ')[1],process.env.JWT_SECRET)
-        
-        // Verificar el rol
-        if (rol==="Administrador"){
-            // Obtener el usuario 
-            req.adminBDD = await Administrador.findById(id).lean().select("-password")
-            // Continue el proceso
-            next()
-        }
-        else{
-            req.estudianteBDD = await Estudiante.findById(id).lean().select("-password")
-            next()
-        }
-
-
-
-    } catch (error) {
-        // Capturar errores y presentarlos
-        const e = new Error("Formato del token no válido")
-        return res.status(404).json({msg:e.message})
+    // Verificar el rol del usuario
+    if (rol === "Administrador") {
+      // Obtener los datos del administrador desde la base de datos
+      req.adminBDD = await Administrador.findById(id).lean().select("-password");
+      if (!req.adminBDD) {
+        return res.status(404).json({ msg: "Administrador no encontrado" });
+      }
+    } else if (rol === "Estudiante") {
+      // Obtener los datos del estudiante desde la base de datos
+      req.estudianteBDD = await Estudiante.findById(id).lean().select("-password");
+      if (!req.estudianteBDD) {
+        return res.status(404).json({ msg: "Estudiante no encontrado" });
+      }
+    } else {
+      // Si el rol no es válido
+      return res.status(403).json({ msg: "Rol no autorizado" });
     }
 
-}
+    // Continuar con el siguiente middleware o controlador
+    next();
+  } catch (error) {
+    // Capturar errores del token y responder
+    return res.status(401).json({ msg: "Formato del token no válido o ha expirado", error: error.message });
+  }
+};
 
-
-
-
-
-// Exportar el método
-export default verificarAutenticacion
+// Exportar el middleware
+export default verificarAutenticacion;

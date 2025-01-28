@@ -2,7 +2,7 @@
 import Estudiante from "../models/Estudiante.js";
 import cloudinary from "cloudinary";
 import multer from "multer";
-import jwt from 'jsonwebtoken'
+import jwt from "jsonwebtoken";
 
 // IMPORTAR EL MÉTODO sendMailToPaciente
 import { sendMailToEstudiante } from "../config/nodemailer.js";
@@ -12,11 +12,23 @@ import generarJWT from "../helpers/crearJWT.js";
 
 // Configurar Cloudinary
 cloudinary.v2.config({
-    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-    api_key: process.env.CLOUDINARY_API_KEY,
-    api_secret: process.env.CLOUDINARY_API_SECRET,
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
 });
-
+const fileFilter = (req, file, cb) => {
+  const allowedTypes = ["image/jpeg", "image/png", "image/jpg"];
+  if (allowedTypes.includes(file.mimetype)) {
+    cb(null, true);
+  } else {
+    cb(
+      new Error(
+        "Formato de archivo no válido. Solo se permiten imágenes (JPEG, PNG)."
+      ),
+      false
+    );
+  }
+};
 // Configuración de multer para manejar la carga de archivos
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -27,7 +39,11 @@ const storage = multer.diskStorage({
   },
 });
 
-const upload = multer({ storage }).single("fotoPerfil"); // Solo permite una foto de perfil
+const upload = multer({
+  storage,
+  limits: { fileSize: 5 * 1024 * 1024 }, // Tamaño máximo: 5MB
+  fileFilter,
+}).single("fotoPerfil"); // Solo permite una foto de perfil
 
 // Método para el proceso de login
 const loginEstudiante = async (req, res) => {
@@ -70,19 +86,19 @@ const loginEstudiante = async (req, res) => {
     fotoPerfil,
     universidad,
     _id,
-    rol
+    rol,
   } = estudianteBDD;
 
   // Enviar la respuesta con el token y los datos del estudiante
   res.status(200).json({
     token,
-      _id,
-      nombre,
-      usuario,
-      email: emailEstudiante,
-      fotoPerfil,
-      universidad,
-      rol
+    _id,
+    nombre,
+    usuario,
+    email: emailEstudiante,
+    fotoPerfil,
+    universidad,
+    rol,
   });
 };
 
@@ -90,14 +106,18 @@ const loginEstudiante = async (req, res) => {
 const registrarEstudiante = async (req, res) => {
   // Desestructurar los campos necesarios
   const { email, usuario, password } = req.body;
-  const validDomains = ['puce.edu.ec','epn.edu.ec','ups.edu.ec']
+  const validDomains = ["puce.edu.ec", "epn.edu.ec", "ups.edu.ec"];
   // Validar que todos los campos estén llenos
   if (Object.values(req.body).includes(null)) {
     return res
       .status(400)
       .json({ msg: "Lo sentimos, debes llenar todos los campos" });
   }
-  if(!email.includes(validDomains[0]) || !email.includes(validDomains[1]) || !email.includes(validDomains[2])){
+  if (
+    !email.includes(validDomains[0]) ||
+    !email.includes(validDomains[1]) ||
+    !email.includes(validDomains[2])
+  ) {
     return res
       .status(400)
       .json({ msg: "Lo sentimos, debes ingresar un correo válido" });
@@ -148,18 +168,22 @@ const registrarEstudiante = async (req, res) => {
   await nuevoEstudiante.save();
 
   // Presentar resultados
-  res
-    .status(200)
-    .json({ msg: "Registro exitoso y correo enviado" });
+  res.status(200).json({ msg: "Registro exitoso y correo enviado" });
 };
 
 // Middleware para manejar la subida de fotos
 const subirFotoPerfil = upload;
 // Método para ver el perfil del estudiante
-const perfilEstudiante = async(req, res) => {
-  const {id,rolToken} = jwt.verify(req.headers.authorization.split(' ')[1],process.env.JWT_SECRET)
-  if(rolToken !== "Estudiante") return res.status(404).json({msg:"No tienes permisos para realizar esta acción"})
-  const estudianteBDD = await Estudiante.findById(id)
+const perfilEstudiante = async (req, res) => {
+  const { id, rolToken } = jwt.verify(
+    req.headers.authorization.split(" ")[1],
+    process.env.JWT_SECRET
+  );
+  if (rolToken !== "Estudiante")
+    return res
+      .status(404)
+      .json({ msg: "No tienes permisos para realizar esta acción" });
+  const estudianteBDD = await Estudiante.findById(id);
   // Desestructurar los datos necesarios del estudiante
   const {
     nombre,
@@ -178,17 +202,17 @@ const perfilEstudiante = async(req, res) => {
   // Enviar la respuesta con el token y los datos del estudiante
   res.status(200).json({
     token,
-      _id,
-      nombre,
-      usuario,
-      email,
-      fotoPerfil,
-      universidad,
-      rol,
-      celular,
-      carrera,
-      bio,
-      intereses
+    _id,
+    nombre,
+    usuario,
+    email,
+    fotoPerfil,
+    universidad,
+    rol,
+    celular,
+    carrera,
+    bio,
+    intereses,
   });
   res.status(200).json(estudianteBDD);
 };
@@ -242,7 +266,7 @@ const actualizarEstudiante = async (req, res) => {
     });
     res.status(200).json(estudianteActualizado);
   } catch (error) {
-     res.status(500).json({ msg: "Hubo un error en el servidor" });
+    res.status(500).json({ msg: "Hubo un error en el servidor" });
   }
 };
 

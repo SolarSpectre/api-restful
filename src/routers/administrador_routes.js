@@ -7,6 +7,7 @@ const router = Router()
 import verificarAutenticacion from '../middlewares/autenticacion.js';
 import { actualizarPassword, actualizarPerfil, comprobarTokenPassword, confirmEmail, login, nuevoPassword, perfil, recuperarPassword, registro } from '../controllers/administrador_controller.js';
 import { validacionAdministrador } from '../middlewares/validacionAdmin.js';
+import { verificarAdmin } from '../middlewares/verificarAdmin.js';
 
 // Rutas publicas
 router.post("/login", login);
@@ -16,7 +17,7 @@ if (process.env.NODE_ENV === 'production') {
   });
 }
 
-router.post("/registro" , registro, validacionAdministrador);
+router.post("/registro" , registro, validacionAdministrador, verificarAutenticacion,verificarAdmin);
 router.get("/confirmar/:token", confirmEmail);
 router.post("/recuperar-password", recuperarPassword);
 router.get("/recuperar-password/:token", comprobarTokenPassword);
