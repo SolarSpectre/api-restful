@@ -76,7 +76,7 @@ const loginEstudiante = async (req, res) => {
   }
 
   // Generar el token JWT
-  const token = generarJWT(estudianteBDD._id, "estudiante");
+  const token = generarJWT(estudianteBDD._id, "Estudiante");
 
   // Desestructurar los datos necesarios del estudiante
   const {

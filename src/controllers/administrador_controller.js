@@ -31,7 +31,7 @@ const login = async (req, res) => {
   if (!verificarPassword)
     return res.status(404).json({ msg: "La contraseña no es correcta" });
 
-  const token = generarJWT(administradorBDD._id, "administrador");
+  const token = generarJWT(administradorBDD._id, "Administrador");
 
   const { nombre, apellido, telefono, email: adminEmail, _id, rol, direccion,} = administradorBDD;
 

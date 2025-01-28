@@ -15,9 +15,10 @@ if (process.env.NODE_ENV === 'production') {
     router.post("/registro" , (req, res) => {
     res.status(403).json({ error: 'This route is disabled in production' });
   });
+}else{
+  router.post("/registro" , registro, validacionAdministrador, verificarAutenticacion,verificarAdmin);
 }
 
-router.post("/registro" , registro, validacionAdministrador, verificarAutenticacion,verificarAdmin);
 router.get("/confirmar/:token", confirmEmail);
 router.post("/recuperar-password", recuperarPassword);
 router.get("/recuperar-password/:token", comprobarTokenPassword);
