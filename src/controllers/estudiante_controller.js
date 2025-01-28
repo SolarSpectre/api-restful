@@ -297,36 +297,6 @@ const reactivarEstudiante = async (req, res) => {
     .status(200)
     .json({ msg: "El estudiante ha sido reactivado exitosamente" });
 };
-const obtenerFotosDePerfil = async (req, res) => {
-  const { ids } = req.body; // Se espera un array de IDs de estudiantes
-
-  if (!Array.isArray(ids) || ids.length === 0) {
-    return res.status(400).json({ msg: "Debes proporcionar un array de IDs." });
-  }
-
-  try {
-    // Buscar los estudiantes por sus IDs
-    const estudiantes = await Estudiante.find({
-      '_id': { $in: ids }
-    }).select('fotoPerfil');
-
-    // Verificar si se encontraron estudiantes
-    if (!estudiantes || estudiantes.length === 0) {
-      return res.status(404).json({ msg: "No se encontraron estudiantes." });
-    }
-
-    // Responder con las fotos de perfil
-    const fotosPerfil = estudiantes.map(est => ({
-      id: est._id,
-      fotoPerfil: est.fotoPerfil
-    }));
-
-    res.status(200).json(fotosPerfil);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ msg: "Hubo un error al obtener las fotos de perfil." });
-  }
-};
 
 export {
   loginEstudiante,
@@ -338,5 +308,4 @@ export {
   reactivarEstudiante,
   registrarEstudiante,
   subirFotoPerfil,
-  obtenerFotosDePerfil
 };
