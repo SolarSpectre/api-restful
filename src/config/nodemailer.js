@@ -71,7 +71,7 @@ const sendMailToEstudiante = async (userMail, password) => {
             <li><strong>Contraseña:</strong> ${password}</li>
         </ul>
         <p>Para iniciar sesión, haz clic en el siguiente enlace:</p>
-        <a href="${process.env.URL_FRONTEND}estudiante/login" style="color: #3498db; text-decoration: none;">Iniciar sesión</a>
+        <a href="${process.env.URL_FRONTEND}login" style="color: #3498db; text-decoration: none;">Iniciar sesión</a>
         <hr>
         <footer style="text-align: center;">
             <p>© 2025 Uni-Connect. Todos los derechos reservados.</p>

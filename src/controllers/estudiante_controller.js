@@ -2,6 +2,7 @@
 import Estudiante from "../models/Estudiante.js";
 import cloudinary from "cloudinary";
 import multer from "multer";
+import jwt from 'jsonwebtoken'
 
 // IMPORTAR EL MÉTODO sendMailToPaciente
 import { sendMailToEstudiante } from "../config/nodemailer.js";
@@ -69,32 +70,37 @@ const loginEstudiante = async (req, res) => {
     fotoPerfil,
     universidad,
     _id,
+    rol
   } = estudianteBDD;
 
   // Enviar la respuesta con el token y los datos del estudiante
   res.status(200).json({
     token,
-    estudiante: {
       _id,
       nombre,
       usuario,
       email: emailEstudiante,
       fotoPerfil,
       universidad,
-    },
+      rol
   });
 };
 
 // Controlador para registrar un estudiante
 const registrarEstudiante = async (req, res) => {
   // Desestructurar los campos necesarios
-  const { email, usuario } = req.body;
-
+  const { email, usuario, password } = req.body;
+  const validDomains = ['puce.edu.ec','epn.edu.ec','ups.edu.ec']
   // Validar que todos los campos estén llenos
-  if (Object.values(req.body).includes("")) {
+  if (Object.values(req.body).includes(null)) {
     return res
       .status(400)
       .json({ msg: "Lo sentimos, debes llenar todos los campos" });
+  }
+  if(!email.includes(validDomains[0]) || !email.includes(validDomains[1]) || !email.includes(validDomains[2])){
+    return res
+      .status(400)
+      .json({ msg: "Lo sentimos, debes ingresar un correo válido" });
   }
 
   // Verificar si el estudiante ya está registrado
@@ -115,9 +121,6 @@ const registrarEstudiante = async (req, res) => {
 
   // Crear una instancia del estudiante
   const nuevoEstudiante = new Estudiante(req.body);
-
-  // Crear un password temporal
-  const password = Math.random().toString(36).slice(2);
 
   // Encriptar el password
   nuevoEstudiante.password = await nuevoEstudiante.encrypPassword(
@@ -147,19 +150,20 @@ const registrarEstudiante = async (req, res) => {
   // Presentar resultados
   res
     .status(200)
-    .json({ msg: "Registro exitoso del estudiante y correo enviado" });
+    .json({ msg: "Registro exitoso y correo enviado" });
 };
 
 // Middleware para manejar la subida de fotos
 const subirFotoPerfil = upload;
 // Método para ver el perfil del estudiante
-const perfilEstudiante = (req, res) => {
-  const estudiante = { ...req.estudianteBDD._doc }; // Crear una copia para no modificar el objeto original
-  delete estudiante.password;
-  delete estudiante.createdAt;
-  delete estudiante.updatedAt;
-  delete estudiante.__v;
-  res.status(200).json(estudiante);
+const perfilEstudiante = async(req, res) => {
+  const {id,rol} = jwt.verify(req.headers.authorization.split(' ')[1],process.env.JWT_SECRET)
+  const estudianteBDD = await Estudiante.findById(id)
+  delete estudianteBDD.password;
+  delete estudianteBDD.createdAt;
+  delete estudianteBDD.updatedAt;
+  delete estudianteBDD.__v;
+  res.status(200).json(estudianteBDD);
 };
 
 // Método para actualizar un estudiante (incluyendo la imagen de perfil)
@@ -211,8 +215,7 @@ const actualizarEstudiante = async (req, res) => {
     });
     res.status(200).json(estudianteActualizado);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ msg: "Hubo un error en el servidor" });
+     res.status(500).json({ msg: "Hubo un error en el servidor" });
   }
 };
 
@@ -245,7 +248,6 @@ const eliminarEstudiante = async (req, res) => {
       .status(200)
       .json({ msg: "El estudiante ha sido dado de baja exitosamente" });
   } catch (error) {
-    console.error(error);
     res.status(500).json({ msg: "Hubo un error en el servidor" });
   }
 };
@@ -295,6 +297,36 @@ const reactivarEstudiante = async (req, res) => {
     .status(200)
     .json({ msg: "El estudiante ha sido reactivado exitosamente" });
 };
+const obtenerFotosDePerfil = async (req, res) => {
+  const { ids } = req.body; // Se espera un array de IDs de estudiantes
+
+  if (!Array.isArray(ids) || ids.length === 0) {
+    return res.status(400).json({ msg: "Debes proporcionar un array de IDs." });
+  }
+
+  try {
+    // Buscar los estudiantes por sus IDs
+    const estudiantes = await Estudiante.find({
+      '_id': { $in: ids }
+    }).select('fotoPerfil');
+
+    // Verificar si se encontraron estudiantes
+    if (!estudiantes || estudiantes.length === 0) {
+      return res.status(404).json({ msg: "No se encontraron estudiantes." });
+    }
+
+    // Responder con las fotos de perfil
+    const fotosPerfil = estudiantes.map(est => ({
+      id: est._id,
+      fotoPerfil: est.fotoPerfil
+    }));
+
+    res.status(200).json(fotosPerfil);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ msg: "Hubo un error al obtener las fotos de perfil." });
+  }
+};
 
 export {
   loginEstudiante,
@@ -306,4 +338,5 @@ export {
   reactivarEstudiante,
   registrarEstudiante,
   subirFotoPerfil,
+  obtenerFotosDePerfil
 };

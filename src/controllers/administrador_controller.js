@@ -6,6 +6,8 @@ import {
 import generarJWT from "../helpers/crearJWT.js";
 import Administrador from "../models/Administrador.js";
 import mongoose from "mongoose";
+import jwt from 'jsonwebtoken'
+
 
 // Método para el login
 const login = async (req, res) => {
@@ -44,13 +46,16 @@ const login = async (req, res) => {
 };
 
 // Método para mostrar el perfil
-const perfil = (req, res) => {
-  delete req.administradorBDD.token;
-  delete req.administradorBDD.confirmEmail;
-  delete req.administradorBDD.createdAt;
-  delete req.administradorBDD.updatedAt;
-  delete req.administradorBDD.__v;
-  res.status(200).json(req.administradorBDD);
+const perfil = async (req, res) => {
+  const {id} = jwt.verify(req.headers.authorization.split(' ')[1],process.env.JWT_SECRET)
+  const adminBDD = await Administrador.findById(id)
+  delete adminBDD.token;
+  delete adminBDD.confirmEmail;
+  delete adminBDD.createdAt;
+  delete adminBDD.updatedAt;
+  delete adminBDD.__v;
+  res.status(200).json(adminBDD);
+
 };
 
 // Método para el registro
