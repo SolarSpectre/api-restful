@@ -25,6 +25,16 @@ const administradorSchema = new Schema({
         type: String,
         require: true
     },
+    celular: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    direccion: {
+        type: String,
+        required: true,
+        default: ''
+    },
     rol: {
         type: String,
         default: 'Administrador'

@@ -43,10 +43,6 @@ const estudianteSchema = new Schema(
       required: true,
       trim: true,
     },
-    anioIngreso: {
-      type: Number,
-      required: true,
-    },
     bio: {
       type: String,
       trim: true,

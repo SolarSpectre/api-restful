@@ -9,6 +9,7 @@ const app = express()
 dotenv.config()
 
 // Configuraciones 
+console.log('NODE_ENV:', process.env.NODE_ENV)
 app.set('port',process.env.port || 3000)
 app.use(cors())
 
