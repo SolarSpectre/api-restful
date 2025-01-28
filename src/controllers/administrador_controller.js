@@ -33,28 +33,38 @@ const login = async (req, res) => {
 
   const token = generarJWT(administradorBDD._id, "administrador");
 
-  const { nombre, apellido, email: adminEmail, _id, rol } = administradorBDD;
+  const { nombre, apellido, telefono, email: adminEmail, _id, rol, direccion,} = administradorBDD;
 
   res.status(200).json({
     token,
     nombre,
     apellido,
+    telefono,
     email: adminEmail,
     _id,
     rol,
+    direccion,
   });
 };
 
 // Método para mostrar el perfil
 const perfil = async (req, res) => {
   const {id} = jwt.verify(req.headers.authorization.split(' ')[1],process.env.JWT_SECRET)
-  const adminBDD = await Administrador.findById(id)
-  delete adminBDD.token;
-  delete adminBDD.confirmEmail;
-  delete adminBDD.createdAt;
-  delete adminBDD.updatedAt;
-  delete adminBDD.__v;
-  res.status(200).json(adminBDD);
+  const administradorBDD = await Administrador.findById(id).select(
+    "-status -__v -token -updatedAt -createdAt"
+  );
+
+  const { nombre, apellido, telefono, email, _id, rol, direccion,} = administradorBDD;
+
+  res.status(200).json({
+    nombre,
+    apellido,
+    telefono,
+    email,
+    _id,
+    rol,
+    direccion,
+  });
 
 };
 
@@ -144,7 +154,7 @@ const actualizarPerfil = async (req, res) => {
 // Método para actualizar el password
 const actualizarPassword = async (req, res) => {
   const administradorBDD = await Administrador.findById(
-    req.administradorBDD._id
+    req.body._id
   );
 
   if (!administradorBDD)

@@ -25,7 +25,7 @@ const administradorSchema = new Schema({
         type: String,
         require: true
     },
-    celular: {
+    telefono: {
       type: String,
       required: true,
       trim: true,

@@ -157,12 +157,39 @@ const registrarEstudiante = async (req, res) => {
 const subirFotoPerfil = upload;
 // Método para ver el perfil del estudiante
 const perfilEstudiante = async(req, res) => {
-  const {id,rol} = jwt.verify(req.headers.authorization.split(' ')[1],process.env.JWT_SECRET)
+  const {id,rolToken} = jwt.verify(req.headers.authorization.split(' ')[1],process.env.JWT_SECRET)
+  if(rolToken !== "Estudiante") return res.status(404).json({msg:"No tienes permisos para realizar esta acción"})
   const estudianteBDD = await Estudiante.findById(id)
-  delete estudianteBDD.password;
-  delete estudianteBDD.createdAt;
-  delete estudianteBDD.updatedAt;
-  delete estudianteBDD.__v;
+  // Desestructurar los datos necesarios del estudiante
+  const {
+    nombre,
+    usuario,
+    email,
+    fotoPerfil,
+    universidad,
+    _id,
+    rol,
+    celular,
+    carrera,
+    bio,
+    intereses,
+  } = estudianteBDD;
+
+  // Enviar la respuesta con el token y los datos del estudiante
+  res.status(200).json({
+    token,
+      _id,
+      nombre,
+      usuario,
+      email,
+      fotoPerfil,
+      universidad,
+      rol,
+      celular,
+      carrera,
+      bio,
+      intereses
+  });
   res.status(200).json(estudianteBDD);
 };
 
