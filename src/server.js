@@ -5,6 +5,7 @@ import cors from 'cors';
 import routerEstudiantes from './routers/estudiante_routes.js';
 import routerAdmin from './routers/administrador_routes.js';
 import routerComunidades from './routers/comunidades_routes.js';
+import routerComentarios from './routers/comentarios_routes.js';
 // Inicializaciones
 const app = express()
 dotenv.config()
@@ -24,7 +25,7 @@ app.use(express.json())
 app.use('/api',routerEstudiantes)
 app.use('/api',routerAdmin)
 app.use('/api',routerComunidades)
-
+app.use('/api',routerComentarios)
 
 
 // Manejo de una ruta que no sea encontrada

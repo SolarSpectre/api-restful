@@ -2,9 +2,8 @@ import Estudiante from "../models/Estudiante.js";
 import Administrador from "../models/Administrador.js";
 import cloudinary from "cloudinary";
 import multer from "multer";
-import jwt from "jsonwebtoken";
 import fs from "fs";
-import path from "path";
+import mongoose from "mongoose";
 import Comunidad from "../models/Comunidad.js";
 // Configurar Cloudinary
 cloudinary.v2.config({
@@ -98,8 +97,10 @@ const subirLogo = upload;
 const unirseComunidad = async (req, res) => {
   try {
     const comunidadId = req.params.id;
-    const estudianteId = req.user._id;
-
+    const estudianteId = req.body._id;
+    if(!estudianteId){
+      return res.status(400).json({mensaje: "No se ha enviado el ID del estudiante"});
+    }
     // Verificar si el estudiante ya está en la comunidad
     const comunidad = await Comunidad.findById(comunidadId);
     if (comunidad.estudiantes.includes(estudianteId)) {
@@ -151,7 +152,7 @@ const actualizarComunidad = async (req, res) => {
   const { id } = req.params;
   const { body, file } = req;
 
-  if (Object.values(body).includes("")) {
+  if (Object.values(body).includes(null)) {
     return res
       .status(400)
       .json({ msg: "Lo sentimos, debes llenar todos los campos" });
@@ -167,7 +168,7 @@ const actualizarComunidad = async (req, res) => {
     if (!comunidad) {
       return res.status(404).json({ msg: "Comunidad no encontrada" });
     }
-   // Si hay una imagen nueva, subirla a Cloudinary
+    // Si hay una imagen nueva, subirla a Cloudinary
     if (file) {
       if (comunidad.logo?.public_id) {
         // Eliminar la imagen anterior de Cloudinary
@@ -186,7 +187,10 @@ const actualizarComunidad = async (req, res) => {
         public_id: resultado.public_id,
       };
       fs.unlinkSync(req.file.path);
-    } 
+    }
+    const comunidadActualizada = await Comunidad.findByIdAndUpdate(id, body, {
+      new: true,
+    });
     res.status(200).json(comunidadActualizada);
   } catch (error) {
     res.status(500).json({ msg: "Error al actualizar la comunidad", error });
@@ -194,22 +198,29 @@ const actualizarComunidad = async (req, res) => {
 };
 // Eliminar una comunidad (Solo el administrador puede hacerlo)
 const eliminarComunidad = async (req, res) => {
+  const id = req.params.id;
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res
+      .status(404)
+      .json({ msg: `Lo sentimos, no existe la comunidad con ID ${id}` });
+  }
   try {
-    const comunidadId = req.params.id;
-
-    // Verificar si el usuario es administrador
-    const comunidad = await Comunidad.findById(comunidadId);
-    if (
-      !comunidad ||
-      comunidad.administrador.toString() !== req.user._id.toString()
-    ) {
-      return res
-        .status(403)
-        .json({ mensaje: "No tienes permisos para eliminar esta comunidad" });
+    const comunidad = await Comunidad.findById(id);
+    if (!comunidad) {
+      return res.status(404).json({ msg: "Comunidad no encontrada" });
     }
 
-    await comunidad.remove();
-    res.status(200).json({ mensaje: "Comunidad eliminada" });
+    // Eliminar la imagen de Cloudinary si existe
+    if (comunidad.logo?.public_id) {
+      await cloudinary.v2.uploader.destroy(comunidad.logo.public_id);
+    }
+
+    // Dar de baja al estudiante
+    comunidad.estado = false;
+    await comunidad.save();
+    res
+      .status(200)
+      .json({ msg: "La comunidad ha sido dado de baja exitosamente" });
   } catch (error) {
     res
       .status(500)
