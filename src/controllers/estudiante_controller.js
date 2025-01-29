@@ -408,13 +408,48 @@ const agregarAmigo = async (req, res) => {
     await estudiante.save();
     await amigo.save();
 
-    res.status(200).json({ mensaje: "Amigo agregado exitosamente", estudiante });
+    res.status(200).json({ mensaje: "Amigo agregado exitosamente" });
   } catch (error) {
     res.status(500).json({ mensaje: "Hubo un error al agregar amigo", error });
   }
 };
 
 
+const eliminarAmigo = async (req, res) => {
+  try {
+    const amigoId = req.params.id; // ID del amigo a eliminar
+    const estudianteId = req.body._id; // ID del estudiante que hace la solicitud
+
+    if (!estudianteId) {
+      return res.status(400).json({ mensaje: "No se ha enviado el ID del estudiante" });
+    }
+
+    // Buscar a ambos estudiantes
+    const estudiante = await Estudiante.findById(estudianteId);
+    const amigo = await Estudiante.findById(amigoId);
+
+    if (!estudiante || !amigo) {
+      return res.status(404).json({ mensaje: "Uno o ambos estudiantes no existen" });
+    }
+
+    // Verificar si realmente son amigos
+    if (!estudiante.amigos.includes(amigoId)) {
+      return res.status(400).json({ mensaje: "Este usuario no es tu amigo" });
+    }
+
+    // Eliminar la amistad en ambos perfiles
+    estudiante.amigos = estudiante.amigos.filter(id => id.toString() !== amigoId);
+    amigo.amigos = amigo.amigos.filter(id => id.toString() !== estudianteId);
+
+    // Guardar cambios
+    await estudiante.save();
+    await amigo.save();
+
+    res.status(200).json({ mensaje: "Amigo eliminado exitosamente" });
+  } catch (error) {
+    res.status(500).json({ mensaje: "Hubo un error al eliminar amigo", error });
+  }
+};
 export {
   loginEstudiante,
   perfilEstudiante,
@@ -426,5 +461,6 @@ export {
   registrarEstudiante,
   subirFotoPerfil,
   agregarAmigo,
+  eliminarAmigo,
   listarEstudiantesDesactivados
 };

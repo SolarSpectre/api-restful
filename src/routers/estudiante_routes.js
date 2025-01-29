@@ -3,7 +3,7 @@ const router = Router()
 
 
 import verificarAutenticacion from "../middlewares/autenticacion.js";
-import { actualizarEstudiante, agregarAmigo, eliminarEstudiante, listarEstudiantes, listarEstudiantesDesactivados, loginEstudiante, obtenerEstudiante, perfilEstudiante, reactivarEstudiante, registrarEstudiante, subirFotoPerfil } from '../controllers/estudiante_controller.js';
+import { actualizarEstudiante, agregarAmigo, eliminarAmigo, eliminarEstudiante, listarEstudiantes, listarEstudiantesDesactivados, loginEstudiante, obtenerEstudiante, perfilEstudiante, reactivarEstudiante, registrarEstudiante, subirFotoPerfil } from '../controllers/estudiante_controller.js';
 import { verificarAdmin } from '../middlewares/verificarAdmin.js';
 
 
@@ -20,5 +20,6 @@ router.get("/estudiantes/desactivado/", verificarAutenticacion,verificarAdmin,li
 router.put("/estudiante/reactivar/:id", verificarAutenticacion,verificarAdmin,reactivarEstudiante);
 
 router.post('/estudiante/:id/agregar', verificarAutenticacion, agregarAmigo);
+router.delete('/estudiante/:id/eliminar', verificarAutenticacion, eliminarAmigo);
 
 export default router
