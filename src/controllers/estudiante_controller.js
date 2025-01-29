@@ -87,11 +87,15 @@ const loginEstudiante = async (req, res) => {
     universidad,
     _id,
     rol,
+    celular,
+    carrera,
+    bio,
+    intereses,
   } = estudianteBDD;
 
   // Enviar la respuesta con el token y los datos del estudiante
   res.status(200).json({
-    token,
+   token,
     _id,
     nombre,
     usuario,
@@ -99,6 +103,10 @@ const loginEstudiante = async (req, res) => {
     fotoPerfil,
     universidad,
     rol,
+    celular,
+    carrera,
+    bio,
+    intereses,
   });
 };
 
