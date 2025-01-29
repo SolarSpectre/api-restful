@@ -176,7 +176,7 @@ const registrarEstudiante = async (req, res) => {
 const subirFotoPerfil = upload;
 // Método para ver el perfil del estudiante
 const perfilEstudiante = async (req, res) => {
-  const { id, rol } = jwt.verify(
+  const { idToken, rol } = jwt.verify(
     req.headers.authorization.split(" ")[1],
     process.env.JWT_SECRET
   );
@@ -184,7 +184,7 @@ const perfilEstudiante = async (req, res) => {
     return res
       .status(404)
       .json({ msg: "No tienes permisos para realizar esta acción" });
-  const estudianteBDD = await Estudiante.findById(id);
+  const estudianteBDD = await Estudiante.findById(idToken);
   const token = generarJWT(estudianteBDD._id, rol);
   // Desestructurar los datos necesarios del estudiante
   const {
@@ -221,7 +221,7 @@ const perfilEstudiante = async (req, res) => {
 const actualizarEstudiante = async (req, res) => {
   const { id } = req.params;
   const { body, file } = req;
-
+  const {idToken,rol} = jwt.verify(req.headers.authorization.split(' ')[1],process.env.JWT_SECRET)
   if (Object.values(body).includes("")) {
     return res
       .status(400)
@@ -239,7 +239,10 @@ const actualizarEstudiante = async (req, res) => {
     if (!estudiante) {
       return res.status(404).json({ msg: "Estudiante no encontrado" });
     }
-
+    // Verificar si el usuario es el dueño de la cuenta o es un administrador
+    if (estudiante._id.toString() !== idToken && rol !== "Administrador") {
+      return res.status(403).json({ error: "No tienes permiso para actualizar esta cuenta" });
+    }
     // Si hay una imagen nueva, subirla a Cloudinary
     if (file) {
       if (estudiante.fotoPerfil?.public_id) {
@@ -249,7 +252,7 @@ const actualizarEstudiante = async (req, res) => {
 
       // Subir la nueva imagen a Cloudinary
       const resultado = await cloudinary.v2.uploader.upload(file.path, {
-        folder: "estudiantes",
+        folder: "estudiantes_perfil",
         width: 300,
         crop: "scale",
       });
@@ -274,7 +277,7 @@ const actualizarEstudiante = async (req, res) => {
 // Método para eliminar (dar de baja) un estudiante
 const eliminarEstudiante = async (req, res) => {
   const { id } = req.params;
-
+  const {idToken,rol} = jwt.verify(req.headers.authorization.split(' ')[1],process.env.JWT_SECRET)
   if (!mongoose.Types.ObjectId.isValid(id)) {
     return res
       .status(404)
@@ -286,7 +289,10 @@ const eliminarEstudiante = async (req, res) => {
     if (!estudiante) {
       return res.status(404).json({ msg: "Estudiante no encontrado" });
     }
-
+    // Verificar si el usuario es el dueño de la cuenta o es un administrador
+    if (estudiante._id.toString() !== idToken && rol !== "Administrador") {
+      return res.status(403).json({ error: "No tienes permiso para actualizar esta cuenta" });
+    }
     // Eliminar la imagen de Cloudinary si existe
     if (estudiante.fotoPerfil?.public_id) {
       await cloudinary.v2.uploader.destroy(estudiante.fotoPerfil.public_id);

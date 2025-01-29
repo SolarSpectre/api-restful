@@ -13,8 +13,8 @@ router.get('/estudiante/perfil',verificarAutenticacion,perfilEstudiante)
 router.get("/estudiantes",verificarAutenticacion,listarEstudiantes);
 router.get("/estudiante/:id",verificarAutenticacion, obtenerEstudiante);
 router.post("/estudiante/registro", subirFotoPerfil, registrarEstudiante);
-router.put("/estudiante/actualizar/:id", verificarAutenticacion,verificarAdmin,actualizarEstudiante);
-router.delete("/estudiante/eliminar/:id", verificarAutenticacion,verificarAdmin,eliminarEstudiante);
+router.put("/estudiante/actualizar/:id", verificarAutenticacion,subirFotoPerfil,actualizarEstudiante);
+router.delete("/estudiante/eliminar/:id", verificarAutenticacion,eliminarEstudiante);
 
 
 

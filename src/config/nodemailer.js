@@ -15,16 +15,27 @@ let transporter = nodemailer.createTransport({
 
 
 const sendMailToUser = (userMail, token) => {
-
     let mailOptions = {
         from: process.env.USER_MAILTRAP,
         to: userMail,
         subject: "Verifica tu cuenta",
-        html: `<p>Hola, haz clic <a href="${process.env.URL_FRONTEND}confirmar/${encodeURIComponent(token)}">aquí</a> para confirmar tu cuenta.</p>`
+        html: `
+        <div style="font-family: Arial, sans-serif; text-align: center; padding: 20px; background-color: #f4f4f4;">
+            <div style="max-width: 500px; margin: auto; background: white; padding: 20px; border-radius: 10px;">
+                <h2 style="color: #2c3e50;">Verificación de Cuenta</h2>
+                <p>Hola,</p>
+                <p>Para confirmar tu cuenta, haz clic en el siguiente botón:</p>
+                <a href="${process.env.URL_FRONTEND}confirmar/${encodeURIComponent(token)}" 
+                   style="display: inline-block; padding: 10px 20px; background-color: #3498db; color: white; text-decoration: none; border-radius: 5px;">
+                   Verificar Cuenta
+                </a>
+                <p>Si no solicitaste esta verificación, ignora este mensaje.</p>
+            </div>
+        </div>
+        `
     };
-    
 
-    transporter.sendMail(mailOptions, function(error, info){
+    transporter.sendMail(mailOptions, function(error, info) {
         if (error) {
             console.log(error);
         } else {
@@ -33,50 +44,63 @@ const sendMailToUser = (userMail, token) => {
     });
 };
 
-
-// send mail with defined transport object
-const sendMailToRecoveryPassword = async(userMail,token)=>{
+// Correo de recuperación de contraseña
+const sendMailToRecoveryPassword = async(userMail, token) => {
     let info = await transporter.sendMail({
-    from: 'admin@vet.com',
-    to: userMail,
-    subject: "Correo para reestablecer tu contraseña",
-    html: `
-    <h1>Sistema de gestión (VET-ESFOT 🐶 😺)</h1>
-    <hr>
-    <a href=${process.env.URL_FRONTEND}recuperar-password/${token}>Clic para reestablecer tu contraseña</a>
-    <hr>
-    <footer>Grandote te da la Bienvenida!</footer>
-    `
+        from: 'admin@uconnect.com',
+        to: userMail,
+        subject: "Recuperación de Contraseña - UConnect",
+        html: `
+        <div style="font-family: Arial, sans-serif; text-align: center; padding: 20px; background-color: #f4f4f4;">
+            <div style="max-width: 500px; margin: auto; background: white; padding: 20px; border-radius: 10px;">
+                <h2 style="color: #e74c3c;">Recuperación de Contraseña</h2>
+                <p>Hola,</p>
+                <p>Hemos recibido una solicitud para restablecer tu contraseña en UConnect.</p>
+                <p>Haz clic en el siguiente botón para continuar con el proceso:</p>
+                <a href="${process.env.URL_FRONTEND}recuperar-password/${token}" 
+                   style="display: inline-block; padding: 10px 20px; background-color: #e74c3c; color: white; text-decoration: none; border-radius: 5px;">
+                   Restablecer Contraseña
+                </a>
+                <p>Si no solicitaste el cambio de contraseña, ignora este mensaje.</p>
+                <hr>
+                <footer style="color: #7f8c8d;">El equipo de UConnect 🚀</footer>
+            </div>
+        </div>
+        `
     });
+
     console.log("Mensaje enviado satisfactoriamente: ", info.messageId);
-}
+};
 
-
-
-
-// Send mail to student
+// Correo de bienvenida a estudiantes (Uni-Connect)
 const sendMailToEstudiante = async (userMail, password) => {
     let info = await transporter.sendMail({
         from: 'admin@universidades.com',
         to: userMail,
         subject: "Bienvenido a la Comunidad Universitaria 🎓",
         html: `
-        <h1>Sistema de Gestión de Estudiantes (Uni-Connect 🎓)</h1>
-        <hr>
-        <p>Hola,</p>
-        <p>¡Bienvenido a Uni-Connect! Estamos emocionados de que formes parte de nuestra comunidad de estudiantes entre universidades.</p>
-        <p>Tu cuenta ha sido creada exitosamente. Aquí están tus credenciales para acceder:</p>
-        <ul>
-            <li><strong>Email:</strong> ${userMail}</li>
-            <li><strong>Contraseña:</strong> ${password}</li>
-        </ul>
-        <p>Para iniciar sesión, haz clic en el siguiente enlace:</p>
-        <a href="${process.env.URL_FRONTEND}login" style="color: #3498db; text-decoration: none;">Iniciar sesión</a>
-        <hr>
-        <footer style="text-align: center;">
-            <p>© 2025 Uni-Connect. Todos los derechos reservados.</p>
-            <p>Conectando estudiantes, creando oportunidades.</p>
-        </footer>
+        <div style="font-family: Arial, sans-serif; text-align: center; padding: 20px; background-color: #f4f4f4;">
+            <div style="max-width: 500px; margin: auto; background: white; padding: 20px; border-radius: 10px;">
+                <h1 style="color: #2c3e50;">🎓 Uni-Connect</h1>
+                <p>Hola,</p>
+                <p>¡Bienvenido a Uni-Connect! Estamos emocionados de que formes parte de nuestra comunidad universitaria.</p>
+                <p>Tu cuenta ha sido creada exitosamente. Aquí están tus credenciales:</p>
+                <ul style="text-align: left; padding-left: 20px;">
+                    <li><strong>Email:</strong> ${userMail}</li>
+                    <li><strong>Contraseña:</strong> ${password}</li>
+                </ul>
+                <p>Para iniciar sesión, haz clic en el siguiente botón:</p>
+                <a href="${process.env.URL_FRONTEND}login" 
+                   style="display: inline-block; padding: 10px 20px; background-color: #3498db; color: white; text-decoration: none; border-radius: 5px;">
+                   Iniciar sesión
+                </a>
+                <hr>
+                <footer style="color: #7f8c8d;">
+                    <p>© 2025 Uni-Connect. Todos los derechos reservados.</p>
+                    <p>Conectando estudiantes, creando oportunidades.</p>
+                </footer>
+            </div>
+        </div>
         `
     });
 

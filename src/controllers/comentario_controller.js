@@ -60,7 +60,7 @@ export const updateComment = async (req, res) => {
   try {
     const { id_comentario } = req.params;
     const { comentario } = req.body;
-    const {id,rol} = jwt.verify(req.headers.authorization.split(' ')[1],process.env.JWT_SECRET)
+    const {idToken,rol} = jwt.verify(req.headers.authorization.split(' ')[1],process.env.JWT_SECRET)
 
     if (!comentario || comentario.trim() === "") {
       return res.status(400).json({ error: "El campo comentario es obligatorio" });
@@ -73,7 +73,7 @@ export const updateComment = async (req, res) => {
     }
 
     // Verificar si el usuario es el dueño del comentario o es un administrador
-    if (existingComment.usuario.toString() !== id && rol !== "Administrador") {
+    if (existingComment.usuario.toString() !== idToken && rol !== "Administrador") {
       return res.status(403).json({ error: "No tienes permiso para actualizar este comentario" });
     }
 
@@ -91,7 +91,7 @@ export const updateComment = async (req, res) => {
 export const deleteComment = async (req, res) => {
   try {
     const { id_comentario } = req.params;
-    const {id,rol} = jwt.verify(req.headers.authorization.split(' ')[1],process.env.JWT_SECRET)
+    const {idToken,rol} = jwt.verify(req.headers.authorization.split(' ')[1],process.env.JWT_SECRET)
 
     // Buscar el comentario
     const existingComment = await Comentario.findById(id_comentario);
@@ -100,7 +100,7 @@ export const deleteComment = async (req, res) => {
     }
 
     // Verificar si el usuario es el dueño del comentario o es un administrador
-    if (existingComment.usuario.toString() !== id && rol !== "Administrador") {
+    if (existingComment.usuario.toString() !== idToken && rol !== "Administrador") {
       return res.status(403).json({ error: "No tienes permiso para eliminar este comentario" });
     }
 

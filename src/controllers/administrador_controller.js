@@ -49,8 +49,8 @@ const login = async (req, res) => {
 
 // Método para mostrar el perfil
 const perfil = async (req, res) => {
-  const {id} = jwt.verify(req.headers.authorization.split(' ')[1],process.env.JWT_SECRET)
-  const administradorBDD = await Administrador.findById(id).select(
+  const {idToken} = jwt.verify(req.headers.authorization.split(' ')[1],process.env.JWT_SECRET)
+  const administradorBDD = await Administrador.findById(idToken).select(
     "-status -__v -token -updatedAt -createdAt"
   );
 

@@ -13,7 +13,7 @@ import { verificarAdmin } from '../middlewares/verificarAdmin.js';
 router.post("/login", login);
 if (process.env.NODE_ENV === 'production') {
     router.post("/registro" , (req, res) => {
-    res.status(403).json({ error: 'This route is disabled in production' });
+    res.status(403).json({ error: 'Esta ruta esta desactivada en produccion' });
   });
 }else{
   router.post("/registro" , registro, validacionAdministrador, verificarAutenticacion,verificarAdmin);
@@ -28,9 +28,7 @@ router.post("/nuevo-password/:token", nuevoPassword);
 
 // Rutas privadas
 router.get("/perfil",verificarAutenticacion , perfil);
-
 router.put('/administrador/actualizarpassword',verificarAutenticacion, actualizarPassword)
-
 router.put("/administrador/:id", verificarAutenticacion, actualizarPerfil);
 
 // Exportar la variable router

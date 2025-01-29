@@ -16,18 +16,18 @@ const verificarAutenticacion = async (req, res, next) => {
   try {
     // Verificar y decodificar el token
     const token = authorization.split(' ')[1]; // Extraer el token después de "Bearer"
-    const { id, rol } = jwt.verify(token, process.env.JWT_SECRET); // Decodificar el token usando la clave secreta
+    const { idToken, rol } = jwt.verify(token, process.env.JWT_SECRET); // Decodificar el token usando la clave secreta
 
     // Verificar el rol del usuario
     if (rol === "Administrador") {
       // Obtener los datos del administrador desde la base de datos
-      req.adminBDD = await Administrador.findById(id).lean().select("-password");
+      req.adminBDD = await Administrador.findById(idToken).lean().select("-password");
       if (!req.adminBDD) {
         return res.status(404).json({ msg: "Administrador no encontrado" });
       }
     } else if (rol === "Estudiante") {
       // Obtener los datos del estudiante desde la base de datos
-      req.estudianteBDD = await Estudiante.findById(id).lean().select("-password");
+      req.estudianteBDD = await Estudiante.findById(idToken).lean().select("-password");
       if (!req.estudianteBDD) {
         return res.status(404).json({ msg: "Estudiante no encontrado" });
       }

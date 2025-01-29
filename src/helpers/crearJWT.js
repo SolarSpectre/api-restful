@@ -2,9 +2,9 @@ import jwt from "jsonwebtoken";
 
 
 
-const generarJWT = (id,rol)=>{
+const generarJWT = (idToken,rol)=>{
 
-    return jwt.sign({id,rol},process.env.JWT_SECRET,{expiresIn:"1d"})
+    return jwt.sign({idToken,rol},process.env.JWT_SECRET,{expiresIn:"1d"})
 }
 
 
