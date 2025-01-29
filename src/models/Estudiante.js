@@ -63,6 +63,10 @@ const estudianteSchema = new Schema(
       type: String,
       default: "Estudiante",
     },
+    amigos: [{
+      type: Schema.Types.ObjectId,
+      ref: 'Estudiante',
+    }],
   },
   {
     timestamps: true,

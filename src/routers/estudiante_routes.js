@@ -3,7 +3,7 @@ const router = Router()
 
 
 import verificarAutenticacion from "../middlewares/autenticacion.js";
-import { actualizarEstudiante, eliminarEstudiante, listarEstudiantes, loginEstudiante, obtenerEstudiante, perfilEstudiante, registrarEstudiante, subirFotoPerfil } from '../controllers/estudiante_controller.js';
+import { actualizarEstudiante, agregarAmigo, eliminarEstudiante, listarEstudiantes, listarEstudiantesDesactivados, loginEstudiante, obtenerEstudiante, perfilEstudiante, reactivarEstudiante, registrarEstudiante, subirFotoPerfil } from '../controllers/estudiante_controller.js';
 import { verificarAdmin } from '../middlewares/verificarAdmin.js';
 
 
@@ -15,6 +15,10 @@ router.get("/estudiante/:id",verificarAutenticacion, obtenerEstudiante);
 router.post("/estudiante/registro", subirFotoPerfil, registrarEstudiante);
 router.put("/estudiante/actualizar/:id", verificarAutenticacion,subirFotoPerfil,actualizarEstudiante);
 router.delete("/estudiante/eliminar/:id", verificarAutenticacion,eliminarEstudiante);
+//Requiere permisos de Administrador reactivar a un estudiante
+router.get("/estudiantes/desactivado/", verificarAutenticacion,verificarAdmin,listarEstudiantesDesactivados);
+router.put("/estudiante/reactivar/:id", verificarAutenticacion,verificarAdmin,reactivarEstudiante);
 
+router.post('/estudiante/:id/agregar', verificarAutenticacion, agregarAmigo);
 
 export default router

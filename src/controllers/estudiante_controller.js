@@ -4,7 +4,6 @@ import cloudinary from "cloudinary";
 import multer from "multer";
 import jwt from "jsonwebtoken";
 import fs from "fs";
-// IMPORTAR EL MÉTODO sendMailToPaciente
 import { sendMailToEstudiante } from "../config/nodemailer.js";
 
 import mongoose from "mongoose";
@@ -57,7 +56,7 @@ const loginEstudiante = async (req, res) => {
   }
 
   // Buscar el estudiante en la base de datos por email
-  const estudianteBDD = await Estudiante.findOne({ email });
+  const estudianteBDD = await Estudiante.findOne({ email }).populate("amigos", "nombre usuario fotoPerfil");
 
   // Verificar si el estudiante existe
   if (!estudianteBDD) {
@@ -87,6 +86,7 @@ const loginEstudiante = async (req, res) => {
     universidad,
     _id,
     rol,
+    amigos,
     celular,
     carrera,
     bio,
@@ -103,6 +103,7 @@ const loginEstudiante = async (req, res) => {
     fotoPerfil,
     universidad,
     rol,
+    amigos,
     celular,
     carrera,
     bio,
@@ -192,7 +193,7 @@ const perfilEstudiante = async (req, res) => {
     return res
       .status(404)
       .json({ msg: "No tienes permisos para realizar esta acción" });
-  const estudianteBDD = await Estudiante.findById(idToken);
+  const estudianteBDD = await Estudiante.findById(idToken).populate("amigos", "nombre usuario fotoPerfil");
   const token = generarJWT(estudianteBDD._id, rol);
   // Desestructurar los datos necesarios del estudiante
   const {
@@ -202,6 +203,7 @@ const perfilEstudiante = async (req, res) => {
     fotoPerfil,
     universidad,
     _id,
+    amigos,
     celular,
     carrera,
     bio,
@@ -218,6 +220,7 @@ const perfilEstudiante = async (req, res) => {
     fotoPerfil,
     universidad,
     rol,
+    amigos,
     celular,
     carrera,
     bio,
@@ -326,6 +329,14 @@ const listarEstudiantes = async (req, res) => {
   res.status(200).json(estudiantes);
 };
 
+// Método para listar todos los estudiantes
+const listarEstudiantesDesactivados = async (req, res) => {
+  const estudiantes = await Estudiante.find({ estado: false }).select(
+    "-password -__v -createdAt -updatedAt"
+  );
+  res.status(200).json(estudiantes);
+};
+
 // Método para obtener un estudiante específico por ID
 const obtenerEstudiante = async (req, res) => {
   const { id } = req.params;
@@ -363,6 +374,46 @@ const reactivarEstudiante = async (req, res) => {
     .status(200)
     .json({ msg: "El estudiante ha sido reactivado exitosamente" });
 };
+const agregarAmigo = async (req, res) => {
+  try {
+    const amigoId = req.params.id; // ID del amigo a agregar
+    const estudianteId = req.body._id; // ID del estudiante que envía la solicitud
+
+    if (!estudianteId) {
+      return res.status(400).json({ mensaje: "No se ha enviado el ID del estudiante" });
+    }
+
+    if (estudianteId === amigoId) {
+      return res.status(400).json({ mensaje: "No puedes agregarte a ti mismo como amigo" });
+    }
+
+    // Buscar a ambos estudiantes
+    const estudiante = await Estudiante.findById(estudianteId);
+    const amigo = await Estudiante.findById(amigoId);
+
+    if (!estudiante || !amigo) {
+      return res.status(404).json({ mensaje: "Uno o ambos estudiantes no existen" });
+    }
+
+    // Verificar si ya son amigos
+    if (estudiante.amigos.includes(amigoId)) {
+      return res.status(400).json({ mensaje: "Este usuario ya es tu amigo" });
+    }
+
+    // Agregar el amigo a ambos perfiles
+    estudiante.amigos.push(amigoId);
+    amigo.amigos.push(estudianteId);
+
+    // Guardar cambios
+    await estudiante.save();
+    await amigo.save();
+
+    res.status(200).json({ mensaje: "Amigo agregado exitosamente", estudiante });
+  } catch (error) {
+    res.status(500).json({ mensaje: "Hubo un error al agregar amigo", error });
+  }
+};
+
 
 export {
   loginEstudiante,
@@ -374,4 +425,6 @@ export {
   reactivarEstudiante,
   registrarEstudiante,
   subirFotoPerfil,
+  agregarAmigo,
+  listarEstudiantesDesactivados
 };
