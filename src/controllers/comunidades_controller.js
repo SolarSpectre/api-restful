@@ -43,64 +43,52 @@ const upload = multer({
 
 // Controlador para crear una comunidad
 const crearComunidad = async (req, res) => {
-  upload(req, res, async (err) => {
-    if (err) {
-      return res.status(400).json({ msg: err.message });
-    }
+  // Validar que todos los campos estén llenos
+  if (Object.values(req.body).includes(null)) {
+    return res
+      .status(400)
+      .json({ msg: "Lo sentimos, debes llenar todos los campos" });
+  }
+  console.log(req.body);
+  const { nombre } = req.body;
+  // Verificar si la comunidad ya existe
+  const verificarComunidadBDD = await Comunidad.findOne({ nombre });
 
+  if (verificarComunidadBDD) {
+    return res
+      .status(400)
+      .json({ msg: "Lo sentimos, ya existe una comunidad con ese nombre" });
+  }
+
+  // Crear una nueva comunidad sin logo inicialmente
+  const nuevaComunidad = new Comunidad(req.body);
+
+  // Subir el logo a Cloudinary si se proporcionó
+  if (req.file) {
     try {
-      const {
-        nombre,
-        descripcion,
-        tipo,
-        carreraRelacionada,
-        interesesRelacionados,
-      } = req.body;
-
-      // Verificar si el usuario es administrador
-      if (req.user.rol !== "Administrador") {
-        return res
-          .status(403)
-          .json({ mensaje: "No tienes permisos para crear una comunidad" });
-      }
-
-      // Crear una nueva comunidad sin logo inicialmente
-      const nuevaComunidad = new Comunidad({
-        nombre,
-        descripcion,
-        tipo,
-        carreraRelacionada,
-        interesesRelacionados,
-        administrador: req.user._id,
+      const result = await cloudinary.v2.uploader.upload(req.file.path, {
+        folder: "logos_comunidades",
       });
+      nuevaComunidad.logo = {
+        url: result.secure_url,
+        public_id: result.public_id,
+      };
 
-      // Subir el logo a Cloudinary si se proporcionó
-      if (req.file) {
-        try {
-          const result = await cloudinary.v2.uploader.upload(req.file.path, {
-            folder: "logos_comunidades", // Carpeta en Cloudinary donde se guardarán los logos
-          });
-          nuevaComunidad.logo = result.secure_url; // Guardar la URL de la imagen en la base de datos
-
-          // Eliminar el archivo temporal después de subirlo a Cloudinary
-          fs.unlinkSync(req.file.path);
-        } catch (error) {
-          // Si falla al subir a Cloudinary, eliminar archivo temporal y retornar error
-          fs.unlinkSync(req.file.path);
-          return res
-            .status(500)
-            .json({ msg: "Error al subir el logo a Cloudinary", error });
-        }
-      }
-
-      // Guardar la comunidad en la base de datos
-      await nuevaComunidad.save();
-      res.status(201).json(nuevaComunidad);
+      // Eliminar el archivo temporal
+      fs.unlinkSync(req.file.path);
     } catch (error) {
-      res
+      if (req.file) fs.unlinkSync(req.file.path);
+      return res
         .status(500)
-        .json({ mensaje: "Hubo un error al crear la comunidad", error });
+        .json({ msg: "Error al subir el logo a Cloudinary", error });
     }
+  }
+
+  // Guardar la comunidad en la base de datos
+  await nuevaComunidad.save();
+  res.status(201).json({
+    msg: "Comunidad creada exitosamente",
+    comunidad: nuevaComunidad,
   });
 };
 
@@ -151,7 +139,7 @@ const verComunidad = async (req, res) => {
       .json({ mensaje: "Hubo un error al obtener la comunidad", error });
   }
 };
-export const obtenerComunidades = async (req, res) => {
+const obtenerComunidades = async (req, res) => {
   try {
     const comunidades = await Comunidad.find();
     res.status(200).json(comunidades);
@@ -159,17 +147,46 @@ export const obtenerComunidades = async (req, res) => {
     res.status(500).json({ msg: "Error al obtener comunidades", error });
   }
 };
-export const actualizarComunidad = async (req, res) => {
+const actualizarComunidad = async (req, res) => {
+  const { id } = req.params;
+  const { body, file } = req;
+
+  if (Object.values(body).includes("")) {
+    return res
+      .status(400)
+      .json({ msg: "Lo sentimos, debes llenar todos los campos" });
+  }
+
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res
+      .status(404)
+      .json({ msg: `Lo sentimos, no existe la comunidad con ID ${id}` });
+  }
   try {
-    const { id } = req.params;
-    const comunidadActualizada = await Comunidad.findByIdAndUpdate(
-      id,
-      req.body,
-      { new: true }
-    );
-    if (!comunidadActualizada) {
+    const comunidad = await Comunidad.findById(id);
+    if (!comunidad) {
       return res.status(404).json({ msg: "Comunidad no encontrada" });
     }
+   // Si hay una imagen nueva, subirla a Cloudinary
+    if (file) {
+      if (comunidad.logo?.public_id) {
+        // Eliminar la imagen anterior de Cloudinary
+        await cloudinary.v2.uploader.destroy(comunidad.logo.public_id);
+      }
+
+      // Subir la nueva imagen a Cloudinary
+      const resultado = await cloudinary.v2.uploader.upload(file.path, {
+        folder: "logos_comunidades",
+        width: 300,
+        crop: "scale",
+      });
+
+      body.logo = {
+        url: resultado.secure_url,
+        public_id: resultado.public_id,
+      };
+      fs.unlinkSync(req.file.path);
+    } 
     res.status(200).json(comunidadActualizada);
   } catch (error) {
     res.status(500).json({ msg: "Error al actualizar la comunidad", error });

@@ -25,8 +25,8 @@ const estudianteSchema = new Schema(
       required: true,
     },
     fotoPerfil: {
-      type: String, // Se puede almacenar la URL de la foto de perfil.
-      default: "", // Valor por defecto si no tiene foto
+      url: String,
+      public_id: String,
     },
     celular: {
       type: String,

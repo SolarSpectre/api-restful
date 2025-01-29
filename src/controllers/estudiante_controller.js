@@ -3,7 +3,7 @@ import Estudiante from "../models/Estudiante.js";
 import cloudinary from "cloudinary";
 import multer from "multer";
 import jwt from "jsonwebtoken";
-
+import fs from "fs";
 // IMPORTAR EL MÉTODO sendMailToPaciente
 import { sendMailToEstudiante } from "../config/nodemailer.js";
 
@@ -106,18 +106,15 @@ const loginEstudiante = async (req, res) => {
 const registrarEstudiante = async (req, res) => {
   // Desestructurar los campos necesarios
   const { email, usuario, password } = req.body;
-  const validDomains = ["puce.edu.ec", "epn.edu.ec", "ups.edu.ec"];
+  const validDomains = ["@puce.edu.ec", "@epn.edu.ec", "@ups.edu.ec"];
   // Validar que todos los campos estén llenos
   if (Object.values(req.body).includes(null)) {
     return res
       .status(400)
       .json({ msg: "Lo sentimos, debes llenar todos los campos" });
   }
-  if (
-    !email.includes(validDomains[0]) ||
-    !email.includes(validDomains[1]) ||
-    !email.includes(validDomains[2])
-  ) {
+
+  if (!validDomains.some((domain) => email.includes(domain))) {
     return res
       .status(400)
       .json({ msg: "Lo sentimos, debes ingresar un correo válido" });
@@ -153,7 +150,11 @@ const registrarEstudiante = async (req, res) => {
       const result = await cloudinary.v2.uploader.upload(req.file.path, {
         folder: "estudiantes_perfil", // Carpeta en Cloudinary donde se guardarán las fotos
       });
-      nuevoEstudiante.fotoPerfil = result.secure_url; // Guardar la URL de la imagen en la base de datos
+      nuevoEstudiante.fotoPerfil = {
+        url: result.secure_url,
+        public_id: result.public_id,
+      };
+      fs.unlinkSync(req.file.path);
     } catch (error) {
       return res
         .status(500)
@@ -175,15 +176,16 @@ const registrarEstudiante = async (req, res) => {
 const subirFotoPerfil = upload;
 // Método para ver el perfil del estudiante
 const perfilEstudiante = async (req, res) => {
-  const { id, rolToken } = jwt.verify(
+  const { id, rol } = jwt.verify(
     req.headers.authorization.split(" ")[1],
     process.env.JWT_SECRET
   );
-  if (rolToken !== "Estudiante")
+  if (rol !== "Estudiante")
     return res
       .status(404)
       .json({ msg: "No tienes permisos para realizar esta acción" });
   const estudianteBDD = await Estudiante.findById(id);
+  const token = generarJWT(estudianteBDD._id, rol);
   // Desestructurar los datos necesarios del estudiante
   const {
     nombre,
@@ -192,7 +194,6 @@ const perfilEstudiante = async (req, res) => {
     fotoPerfil,
     universidad,
     _id,
-    rol,
     celular,
     carrera,
     bio,
@@ -214,7 +215,6 @@ const perfilEstudiante = async (req, res) => {
     bio,
     intereses,
   });
-  res.status(200).json(estudianteBDD);
 };
 
 // Método para actualizar un estudiante (incluyendo la imagen de perfil)
@@ -258,6 +258,7 @@ const actualizarEstudiante = async (req, res) => {
         url: resultado.secure_url,
         public_id: resultado.public_id,
       };
+      fs.unlinkSync(req.file.path);
     }
 
     // Actualizar el estudiante con los nuevos datos
@@ -299,7 +300,7 @@ const eliminarEstudiante = async (req, res) => {
       .status(200)
       .json({ msg: "El estudiante ha sido dado de baja exitosamente" });
   } catch (error) {
-    res.status(500).json({ msg: "Hubo un error en el servidor" });
+    res.status(500).json({ msg: "Hubo un error en el servidor"});
   }
 };
 

@@ -2,11 +2,11 @@
 import {Router} from 'express'
 import { verificarAdmin } from '../middlewares/verificarAdmin.js';
 import verificarAutenticacion from '../middlewares/autenticacion.js';
-import { actualizarComunidad, crearComunidad, eliminarComunidad, obtenerComunidades, unirseComunidad, verComunidad } from '../controllers/comunidades_controller.js';
+import { actualizarComunidad, crearComunidad, eliminarComunidad, obtenerComunidades, subirLogo, unirseComunidad, verComunidad } from '../controllers/comunidades_controller.js';
 const router = Router()
 
 // Ruta para crear una comunidad (solo administradores)
-router.post('/comunidades', verificarAutenticacion, verificarAdmin, crearComunidad);
+router.post('/comunidades', verificarAutenticacion, verificarAdmin,subirLogo, crearComunidad);
 
 // Ruta para obtener todas las comunidades (accesible para estudiantes y administradores)
 router.get('/comunidades', verificarAutenticacion, obtenerComunidades);
@@ -15,7 +15,7 @@ router.get('/comunidades', verificarAutenticacion, obtenerComunidades);
 router.get('/comunidades/:id', verificarAutenticacion, verComunidad);
 
 // Ruta para actualizar una comunidad (solo administradores)
-router.put('/comunidades/:id', verificarAutenticacion, verificarAdmin, actualizarComunidad);
+router.put('/comunidades/:id', verificarAutenticacion, verificarAdmin,subirLogo, actualizarComunidad);
 
 // Ruta para eliminar una comunidad (solo administradores)
 router.delete('/comunidades/:id', verificarAutenticacion, verificarAdmin, eliminarComunidad);

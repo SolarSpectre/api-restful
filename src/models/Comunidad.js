@@ -9,16 +9,17 @@ const comunidadSchema = new Schema(
     },
     descripcion: {
       type: String,
+      require: true,
       trim: true,
     },
     logo: {
-      type: String, // Se puede almacenar la URL de la foto
-      default: "", // Valor por defecto si no tiene foto
+        url: String,
+        public_id: String,
     },
     tipo: {
       type: String,
+      require: true,
       enum: ['Carrera', 'Intereses'],
-      required: true,
     },
     carreraRelacionada: {
       type: String, // Si el tipo es "Carrera", se define la carrera
@@ -36,7 +37,6 @@ const comunidadSchema = new Schema(
     administrador: {
       type: Schema.Types.ObjectId,
       ref: 'Administrador', // El administrador de la comunidad
-      required: true,
     },
     estado: {
       type: Boolean,
