@@ -48,7 +48,16 @@ const crearComunidad = async (req, res) => {
       .status(400)
       .json({ msg: "Lo sentimos, debes llenar todos los campos" });
   }
-  console.log(req.body);
+  // Convertir el campo "interesesRelacionados" a un array si es una cadena
+  if (typeof req.body.interesesRelacionados === "string") {
+    try {
+      req.body.interesesRelacionados = JSON.parse(req.body.interesesRelacionados);
+    } catch (error) {
+      return res.status(400).json({
+        msg: "Error al procesar los intereses relacionados. Formato incorrecto.",
+      });
+    }
+  }
   const { nombre } = req.body;
   // Verificar si la comunidad ya existe
   const verificarComunidadBDD = await Comunidad.findOne({ nombre });
@@ -132,7 +141,6 @@ const verComunidad = async (req, res) => {
     if (!comunidad) {
       return res.status(404).json({ mensaje: "Comunidad no encontrada" });
     }
-
     res.status(200).json(comunidad);
   } catch (error) {
     res

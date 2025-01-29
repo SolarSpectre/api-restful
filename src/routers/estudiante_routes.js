@@ -17,9 +17,4 @@ router.put("/estudiante/actualizar/:id", verificarAutenticacion,subirFotoPerfil,
 router.delete("/estudiante/eliminar/:id", verificarAutenticacion,eliminarEstudiante);
 
 
-
-
-
-
-
 export default router
