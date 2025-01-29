@@ -20,6 +20,6 @@ router.get("/estudiantes/desactivado/", verificarAutenticacion,verificarAdmin,li
 router.put("/estudiante/reactivar/:id", verificarAutenticacion,verificarAdmin,reactivarEstudiante);
 
 router.post('/estudiante/:id/agregar', verificarAutenticacion, agregarAmigo);
-router.delete('/estudiante/:id/eliminar', verificarAutenticacion, eliminarAmigo);
+router.post('/estudiante/:id/eliminar', verificarAutenticacion, eliminarAmigo);
 
 export default router

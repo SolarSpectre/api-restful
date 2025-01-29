@@ -13,8 +13,11 @@ dotenv.config()
 // Configuraciones 
 console.log('NODE_ENV:', process.env.NODE_ENV)
 app.set('port',process.env.port || 3000)
-app.use(cors())
-
+app.use(cors({
+  origin: 'http://localhost:5173', // Asegúrate de poner el URL de tu frontend
+  allowedHeaders: ['Content-Type', 'Authorization'], // Permite el encabezado Authorization
+  credentials: true, // Permite enviar cookies y encabezados como Authorization
+}));
 // Middlewares 
 app.use(express.json())
 
