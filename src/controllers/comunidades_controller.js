@@ -150,7 +150,7 @@ const verComunidad = async (req, res) => {
 };
 const obtenerComunidades = async (req, res) => {
   try {
-    const comunidades = await Comunidad.find();
+    const comunidades = await Comunidad.find({ estado: true });
     res.status(200).json(comunidades);
   } catch (error) {
     res.status(500).json({ msg: "Error al obtener comunidades", error });
@@ -165,7 +165,15 @@ const actualizarComunidad = async (req, res) => {
       .status(400)
       .json({ msg: "Lo sentimos, debes llenar todos los campos" });
   }
-
+  if (typeof req.body.interesesRelacionados === "string") {
+    try {
+      req.body.interesesRelacionados = JSON.parse(req.body.interesesRelacionados);
+    } catch (error) {
+      return res.status(400).json({
+        msg: "Error al procesar los intereses relacionados. Formato incorrecto.",
+      });
+    }
+  }
   if (!mongoose.Types.ObjectId.isValid(id)) {
     return res
       .status(404)
