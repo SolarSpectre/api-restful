@@ -1,6 +1,5 @@
 // IMPORTAR EL MODELO
 import Estudiante from "../models/Estudiante.js";
-import cloudinary from "cloudinary";
 import multer from "multer";
 import jwt from "jsonwebtoken";
 import fs from "fs";
@@ -9,12 +8,7 @@ import { sendMailToEstudiante } from "../config/nodemailer.js";
 import mongoose from "mongoose";
 import generarJWT from "../helpers/crearJWT.js";
 
-// Configurar Cloudinary
-cloudinary.v2.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-});
+
 const fileFilter = (req, file, cb) => {
   const allowedTypes = ["image/jpeg", "image/png", "image/jpg"];
   if (allowedTypes.includes(file.mimetype)) {

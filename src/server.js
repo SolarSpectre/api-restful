@@ -6,6 +6,7 @@ import routerEstudiantes from './routers/estudiante_routes.js';
 import routerAdmin from './routers/administrador_routes.js';
 import routerComunidades from './routers/comunidades_routes.js';
 import routerComentarios from './routers/comentarios_routes.js';
+import routerMensajes from './routers/mensajes_routes.js';
 // Inicializaciones
 const app = express()
 dotenv.config()
@@ -29,6 +30,7 @@ app.use('/api',routerEstudiantes)
 app.use('/api',routerAdmin)
 app.use('/api',routerComunidades)
 app.use('/api',routerComentarios)
+app.use('/api',routerMensajes)
 
 
 // Manejo de una ruta que no sea encontrada
