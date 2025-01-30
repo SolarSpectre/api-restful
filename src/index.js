@@ -12,10 +12,9 @@ import connection from './database.js';
 dotenv.config();
 
 // Configurations
-console.log('NODE_ENV:', process.env.NODE_ENV);
 app.set('port', process.env.PORT || 3000);
 app.use(cors({
-  origin: 'http://localhost:5173', // Make sure this is correct
+  origin: `${process.env.URL_FRONTEND}`, // Make sure this is correct
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
 }));

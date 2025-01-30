@@ -1,16 +1,10 @@
-import Estudiante from "../models/Estudiante.js";
-import Administrador from "../models/Administrador.js";
-import cloudinary from "cloudinary";
+// Importar los módulos necesarios
+import cloudinary from "../config/cloudinary.js";
 import multer from "multer";
 import fs from "fs";
 import mongoose from "mongoose";
 import Comunidad from "../models/Comunidad.js";
-// Configurar Cloudinary
-cloudinary.v2.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-});
+
 
 // Configuración de multer para manejar la carga de archivos
 const storage = multer.diskStorage({
