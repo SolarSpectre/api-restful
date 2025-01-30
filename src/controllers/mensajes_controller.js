@@ -1,6 +1,8 @@
 import Estudiante from "../models/Estudiante.js";
 import Message from "../models/Mensajes.js";
-
+import fs from "fs";
+import path from "path";
+import multer from "multer";
 import cloudinary from "../config/cloudinary.js";
 import { getReceiverSocketId, io } from "../config/socket.js";
 
@@ -33,18 +35,54 @@ export const obtenerMensajes = async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 };
-
+// Configuración de multer para manejar la carga de archivos
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "uploads/"); // Carpeta temporal donde se guardan los archivos
+  },
+  filename: (req, file, cb) => {
+    cb(null, `${Date.now()}-${file.originalname}`); // Genera un nombre único para la imagen
+  },
+});
+const fileFilter = (req, file, cb) => {
+  const allowedTypes = ["image/jpeg", "image/png", "image/jpg"];
+  if (allowedTypes.includes(file.mimetype)) {
+    cb(null, true);
+  } else {
+    cb(
+      new Error(
+        "Formato de archivo no válido. Solo se permiten imágenes (JPEG, PNG)."
+      ),
+      false
+    );
+  }
+};
+const upload = multer({
+  storage,
+  limits: { fileSize: 5 * 1024 * 1024 }, // Tamaño máximo: 5MB
+  fileFilter,
+}).single("imagen");
+export const subirImagen = upload;
 export const enviarMensaje = async (req, res) => {
   try {
-    const { texto, imagen } = req.body;
+    console.log(req.body)
+
+    const { texto } = req.body;
     const { id: receptor } = req.params;
     const emisor = req.estudianteBDD._id;
 
     let imageUrl;
-    if (imagen) {
-      // Upload base64 image to cloudinary
-      const uploadResponse = await cloudinary.uploader.upload(imagen);
+    if (req.file) {
+      const uploadResponse = await cloudinary.uploader.upload(req.file.path,{
+        folder: "mensajes",
+          quality: "auto", 
+          fetch_format: "auto",
+          width: 1024,
+          height: 1024, 
+          crop: "limit"
+      });
       imageUrl = uploadResponse.secure_url;
+      fs.unlinkSync(req.file.path);
     }
 
     const newMessage = new Message({
@@ -63,6 +101,10 @@ export const enviarMensaje = async (req, res) => {
 
     res.status(201).json(newMessage);
   } catch (error) {
+    if (req.file) fs.unlinkSync(req.file.path);
+    if (error.status === 413) {
+      return res.status(413).json({ error: "Payload Too Large" });
+    }
     console.log("Error in sendMessage controller: ", error.message);
     res.status(500).json({ error: "Internal server error" });
   }
