@@ -3,6 +3,7 @@ import Estudiante from "../models/Estudiante.js";
 import multer from "multer";
 import jwt from "jsonwebtoken";
 import fs from "fs-extra";
+import path from "path"
 import { sendMailToEstudiante } from "../config/nodemailer.js";
 
 import mongoose from "mongoose";
