@@ -3,11 +3,17 @@ import Estudiante from "../models/Estudiante.js";
 import multer from "multer";
 import jwt from "jsonwebtoken";
 import fs from "fs-extra";
-import path from "path"
+import path from "path";
 import { sendMailToEstudiante } from "../config/nodemailer.js";
 
 import mongoose from "mongoose";
 import generarJWT from "../helpers/crearJWT.js";
+import { dirname } from "path";
+
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 const uploadDir = path.join(__dirname, "temp_uploads");
 
 // ✅ Crear la carpeta automáticamente si no existe

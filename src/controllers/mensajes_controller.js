@@ -5,7 +5,12 @@ import path from "path";
 import multer from "multer";
 import cloudinary from "../config/cloudinary.js";
 import { getReceiverSocketId, io } from "../config/socket.js";
+import { dirname } from "path";
 
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 const uploadDir = path.join(__dirname, "temp_uploads");
 
 // ✅ Crear la carpeta automáticamente si no existe
