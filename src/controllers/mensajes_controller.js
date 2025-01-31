@@ -76,7 +76,6 @@ const upload = multer({
 export const subirImagen = upload;
 export const enviarMensaje = async (req, res) => {
   try {
-    console.log(req.body)
 
     const { texto } = req.body;
     const { id: receptor } = req.params;

@@ -12,10 +12,7 @@ import connection from "./database.js";
 dotenv.config(); // Configurations
 app.set("port", process.env.PORT || 3000);
 const allowedOrigins = [process.env.URL_FRONTEND];
-app.use((req, res, next) => {
-  console.log("Origin:", req.headers.origin);
-  next();
-});
+
 app.use(
   cors({
     origin: (origin, callback) => {
