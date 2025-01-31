@@ -4,10 +4,11 @@ import express from "express";
 
 const app = express();
 const server = http.createServer(app);
+const allowedOrigins = [process.env.URL_FRONTEND];
 
 const io = new Server(server, {
   cors: {
-    origin: [`${process.env.URL_FRONTEND}`],
+    origin: allowedOrigins,
   },
 });
 
