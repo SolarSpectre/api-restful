@@ -16,6 +16,7 @@ app.set('port', process.env.PORT || 3000);
 app.use(cors({
   origin: `${process.env.URL_FRONTEND}`, // Make sure this is correct
   allowedHeaders: ['Content-Type', 'Authorization'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   credentials: true,
 }));
 
