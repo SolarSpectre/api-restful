@@ -2,12 +2,15 @@
 import Estudiante from "../models/Estudiante.js";
 import multer from "multer";
 import jwt from "jsonwebtoken";
-import fs from "fs";
+import fs from "fs-extra";
 import { sendMailToEstudiante } from "../config/nodemailer.js";
 
 import mongoose from "mongoose";
 import generarJWT from "../helpers/crearJWT.js";
+const uploadDir = path.join(__dirname, "temp_uploads");
 
+// ✅ Crear la carpeta automáticamente si no existe
+fs.ensureDirSync(uploadDir);
 
 const fileFilter = (req, file, cb) => {
   const allowedTypes = ["image/jpeg", "image/png", "image/jpg"];
@@ -25,7 +28,8 @@ const fileFilter = (req, file, cb) => {
 // Configuración de multer para manejar la carga de archivos
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "uploads/"); // Carpeta temporal donde se guardan los archivos
+    fs.ensureDirSync(uploadDir); // Asegurar que la carpeta existe antes de guardar
+    cb(null, uploadDir);
   },
   filename: (req, file, cb) => {
     cb(null, `${Date.now()}-${file.originalname}`); // Genera un nombre único para la imagen
@@ -50,7 +54,10 @@ const loginEstudiante = async (req, res) => {
   }
 
   // Buscar el estudiante en la base de datos por email
-  const estudianteBDD = await Estudiante.findOne({ email }).populate("amigos", "nombre usuario fotoPerfil");
+  const estudianteBDD = await Estudiante.findOne({ email }).populate(
+    "amigos",
+    "nombre usuario fotoPerfil"
+  );
 
   // Verificar si el estudiante existe
   if (!estudianteBDD) {
@@ -89,7 +96,7 @@ const loginEstudiante = async (req, res) => {
 
   // Enviar la respuesta con el token y los datos del estudiante
   res.status(200).json({
-   token,
+    token,
     _id,
     nombre,
     usuario,
@@ -157,7 +164,7 @@ const registrarEstudiante = async (req, res) => {
         url: result.secure_url,
         public_id: result.public_id,
       };
-      fs.unlinkSync(req.file.path);
+      await fs.remove(uploadDir);
     } catch (error) {
       return res
         .status(500)
@@ -187,7 +194,10 @@ const perfilEstudiante = async (req, res) => {
     return res
       .status(404)
       .json({ msg: "No tienes permisos para realizar esta acción" });
-  const estudianteBDD = await Estudiante.findById(idToken).populate("amigos", "nombre usuario fotoPerfil");
+  const estudianteBDD = await Estudiante.findById(idToken).populate(
+    "amigos",
+    "nombre usuario fotoPerfil"
+  );
   const token = generarJWT(estudianteBDD._id, rol);
   // Desestructurar los datos necesarios del estudiante
   const {
@@ -226,7 +236,10 @@ const perfilEstudiante = async (req, res) => {
 const actualizarEstudiante = async (req, res) => {
   const { id } = req.params;
   const { body, file } = req;
-  const {idToken,rol} = jwt.verify(req.headers.authorization.split(' ')[1],process.env.JWT_SECRET)
+  const { idToken, rol } = jwt.verify(
+    req.headers.authorization.split(" ")[1],
+    process.env.JWT_SECRET
+  );
   if (Object.values(body).includes("")) {
     return res
       .status(400)
@@ -246,7 +259,9 @@ const actualizarEstudiante = async (req, res) => {
     }
     // Verificar si el usuario es el dueño de la cuenta o es un administrador
     if (estudiante._id.toString() !== idToken && rol !== "Administrador") {
-      return res.status(403).json({ error: "No tienes permiso para actualizar esta cuenta" });
+      return res
+        .status(403)
+        .json({ error: "No tienes permiso para actualizar esta cuenta" });
     }
     // Si hay una imagen nueva, subirla a Cloudinary
     if (file) {
@@ -266,7 +281,7 @@ const actualizarEstudiante = async (req, res) => {
         url: resultado.secure_url,
         public_id: resultado.public_id,
       };
-      fs.unlinkSync(req.file.path);
+      await fs.remove(uploadDir);
     }
 
     // Actualizar el estudiante con los nuevos datos
@@ -275,6 +290,7 @@ const actualizarEstudiante = async (req, res) => {
     });
     res.status(200).json(estudianteActualizado);
   } catch (error) {
+    await fs.remove(uploadDir);
     res.status(500).json({ msg: "Hubo un error en el servidor" });
   }
 };
@@ -282,7 +298,10 @@ const actualizarEstudiante = async (req, res) => {
 // Método para eliminar (dar de baja) un estudiante
 const eliminarEstudiante = async (req, res) => {
   const { id } = req.params;
-  const {idToken,rol} = jwt.verify(req.headers.authorization.split(' ')[1],process.env.JWT_SECRET)
+  const { idToken, rol } = jwt.verify(
+    req.headers.authorization.split(" ")[1],
+    process.env.JWT_SECRET
+  );
   if (!mongoose.Types.ObjectId.isValid(id)) {
     return res
       .status(404)
@@ -296,7 +315,9 @@ const eliminarEstudiante = async (req, res) => {
     }
     // Verificar si el usuario es el dueño de la cuenta o es un administrador
     if (estudiante._id.toString() !== idToken && rol !== "Administrador") {
-      return res.status(403).json({ error: "No tienes permiso para actualizar esta cuenta" });
+      return res
+        .status(403)
+        .json({ error: "No tienes permiso para actualizar esta cuenta" });
     }
     // Eliminar la imagen de Cloudinary si existe
     if (estudiante.fotoPerfil?.public_id) {
@@ -311,7 +332,7 @@ const eliminarEstudiante = async (req, res) => {
       .status(200)
       .json({ msg: "El estudiante ha sido dado de baja exitosamente" });
   } catch (error) {
-    res.status(500).json({ msg: "Hubo un error en el servidor"});
+    res.status(500).json({ msg: "Hubo un error en el servidor" });
   }
 };
 
@@ -374,11 +395,15 @@ const agregarAmigo = async (req, res) => {
     const estudianteId = req.body._id; // ID del estudiante que envía la solicitud
 
     if (!estudianteId) {
-      return res.status(400).json({ mensaje: "No se ha enviado el ID del estudiante" });
+      return res
+        .status(400)
+        .json({ mensaje: "No se ha enviado el ID del estudiante" });
     }
 
     if (estudianteId === amigoId) {
-      return res.status(400).json({ mensaje: "No puedes agregarte a ti mismo como amigo" });
+      return res
+        .status(400)
+        .json({ mensaje: "No puedes agregarte a ti mismo como amigo" });
     }
 
     // Buscar a ambos estudiantes
@@ -386,7 +411,9 @@ const agregarAmigo = async (req, res) => {
     const amigo = await Estudiante.findById(amigoId);
 
     if (!estudiante || !amigo) {
-      return res.status(404).json({ mensaje: "Uno o ambos estudiantes no existen" });
+      return res
+        .status(404)
+        .json({ mensaje: "Uno o ambos estudiantes no existen" });
     }
 
     // Verificar si ya son amigos
@@ -408,14 +435,15 @@ const agregarAmigo = async (req, res) => {
   }
 };
 
-
 const eliminarAmigo = async (req, res) => {
   try {
     const amigoId = req.params.id; // ID del amigo a eliminar
     const estudianteId = req.body._id; // ID del estudiante que hace la solicitud
 
     if (!estudianteId) {
-      return res.status(400).json({ mensaje: "No se ha enviado el ID del estudiante" });
+      return res
+        .status(400)
+        .json({ mensaje: "No se ha enviado el ID del estudiante" });
     }
 
     // Buscar a ambos estudiantes
@@ -423,7 +451,9 @@ const eliminarAmigo = async (req, res) => {
     const amigo = await Estudiante.findById(amigoId);
 
     if (!estudiante || !amigo) {
-      return res.status(404).json({ mensaje: "Uno o ambos estudiantes no existen" });
+      return res
+        .status(404)
+        .json({ mensaje: "Uno o ambos estudiantes no existen" });
     }
 
     // Verificar si realmente son amigos
@@ -432,8 +462,10 @@ const eliminarAmigo = async (req, res) => {
     }
 
     // Eliminar la amistad en ambos perfiles
-    estudiante.amigos = estudiante.amigos.filter(id => id.toString() !== amigoId);
-    amigo.amigos = amigo.amigos.filter(id => id.toString() !== estudianteId);
+    estudiante.amigos = estudiante.amigos.filter(
+      (id) => id.toString() !== amigoId
+    );
+    amigo.amigos = amigo.amigos.filter((id) => id.toString() !== estudianteId);
 
     // Guardar cambios
     await estudiante.save();
@@ -446,9 +478,7 @@ const eliminarAmigo = async (req, res) => {
 };
 // Método para actualizar el password
 const actualizarPassword = async (req, res) => {
-  const estudianteBDD = await Estudiante.findById(
-    req.body._id
-  );
+  const estudianteBDD = await Estudiante.findById(req.body._id);
 
   if (!estudianteBDD)
     return res.status(404).json({ msg: "No existe el estudiante" });
@@ -481,5 +511,5 @@ export {
   agregarAmigo,
   eliminarAmigo,
   listarEstudiantesDesactivados,
-  actualizarPassword
+  actualizarPassword,
 };

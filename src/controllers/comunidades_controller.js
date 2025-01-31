@@ -1,15 +1,19 @@
 // Importar los módulos necesarios
 import cloudinary from "../config/cloudinary.js";
 import multer from "multer";
-import fs from "fs";
+import fs from "fs-extra";
 import mongoose from "mongoose";
 import Comunidad from "../models/Comunidad.js";
 
+const uploadDir = path.join(__dirname, "temp_uploads");
 
+// ✅ Crear la carpeta automáticamente si no existe
+fs.ensureDirSync(uploadDir);
 // Configuración de multer para manejar la carga de archivos
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "uploads/"); // Carpeta temporal donde se guardan los archivos
+    fs.ensureDirSync(uploadDir); // Asegurar que la carpeta existe antes de guardar
+    cb(null, uploadDir);
   },
   filename: (req, file, cb) => {
     cb(null, `${Date.now()}-${file.originalname}`); // Genera un nombre único para la imagen
@@ -45,7 +49,9 @@ const crearComunidad = async (req, res) => {
   // Convertir el campo "interesesRelacionados" a un array si es una cadena
   if (typeof req.body.interesesRelacionados === "string") {
     try {
-      req.body.interesesRelacionados = JSON.parse(req.body.interesesRelacionados);
+      req.body.interesesRelacionados = JSON.parse(
+        req.body.interesesRelacionados
+      );
     } catch (error) {
       return res.status(400).json({
         msg: "Error al procesar los intereses relacionados. Formato incorrecto.",
@@ -77,9 +83,9 @@ const crearComunidad = async (req, res) => {
       };
 
       // Eliminar el archivo temporal
-      fs.unlinkSync(req.file.path);
+      await fs.remove(uploadDir);
     } catch (error) {
-      if (req.file) fs.unlinkSync(req.file.path);
+      if (req.file) await fs.remove(uploadDir);
       return res
         .status(500)
         .json({ msg: "Error al subir el logo a Cloudinary", error });
@@ -101,8 +107,10 @@ const unirseComunidad = async (req, res) => {
   try {
     const comunidadId = req.params.id;
     const estudianteId = req.body._id;
-    if(!estudianteId){
-      return res.status(400).json({mensaje: "No se ha enviado el ID del estudiante"});
+    if (!estudianteId) {
+      return res
+        .status(400)
+        .json({ mensaje: "No se ha enviado el ID del estudiante" });
     }
     // Verificar si el estudiante ya está en la comunidad
     const comunidad = await Comunidad.findById(comunidadId);
@@ -161,7 +169,9 @@ const actualizarComunidad = async (req, res) => {
   }
   if (typeof req.body.interesesRelacionados === "string") {
     try {
-      req.body.interesesRelacionados = JSON.parse(req.body.interesesRelacionados);
+      req.body.interesesRelacionados = JSON.parse(
+        req.body.interesesRelacionados
+      );
     } catch (error) {
       return res.status(400).json({
         msg: "Error al procesar los intereses relacionados. Formato incorrecto.",
@@ -196,13 +206,14 @@ const actualizarComunidad = async (req, res) => {
         url: resultado.secure_url,
         public_id: resultado.public_id,
       };
-      fs.unlinkSync(req.file.path);
+      await fs.remove(uploadDir);
     }
     const comunidadActualizada = await Comunidad.findByIdAndUpdate(id, body, {
       new: true,
     });
     res.status(200).json(comunidadActualizada);
   } catch (error) {
+    await fs.remove(uploadDir);
     res.status(500).json({ msg: "Error al actualizar la comunidad", error });
   }
 };

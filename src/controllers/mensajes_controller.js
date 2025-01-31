@@ -1,10 +1,15 @@
 import Estudiante from "../models/Estudiante.js";
 import Message from "../models/Mensajes.js";
-import fs from "fs";
+import fs from "fs-extra";
 import path from "path";
 import multer from "multer";
 import cloudinary from "../config/cloudinary.js";
 import { getReceiverSocketId, io } from "../config/socket.js";
+
+const uploadDir = path.join(__dirname, "temp_uploads");
+
+// ✅ Crear la carpeta automáticamente si no existe
+fs.ensureDirSync(uploadDir);
 
 export const usuarioSidebar = async (req, res) => {
   try {
@@ -38,7 +43,8 @@ export const obtenerMensajes = async (req, res) => {
 // Configuración de multer para manejar la carga de archivos
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "uploads/"); // Carpeta temporal donde se guardan los archivos
+    fs.ensureDirSync(uploadDir); // Asegurar que la carpeta existe antes de guardar
+    cb(null, uploadDir);
   },
   filename: (req, file, cb) => {
     cb(null, `${Date.now()}-${file.originalname}`); // Genera un nombre único para la imagen
@@ -82,8 +88,8 @@ export const enviarMensaje = async (req, res) => {
           crop: "limit"
       });
       imageUrl = uploadResponse.secure_url;
-      fs.unlinkSync(req.file.path);
-    }
+      await fs.remove(uploadDir);
+        }
 
     const newMessage = new Message({
       emisor,
@@ -101,7 +107,7 @@ export const enviarMensaje = async (req, res) => {
 
     res.status(201).json(newMessage);
   } catch (error) {
-    if (req.file) fs.unlinkSync(req.file.path);
+    if (req.file) await fs.remove(uploadDir);
     if (error.status === 413) {
       return res.status(413).json({ error: "Payload Too Large" });
     }
