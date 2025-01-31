@@ -3,7 +3,7 @@ const router = Router()
 
 
 import verificarAutenticacion from "../middlewares/autenticacion.js";
-import { actualizarEstudiante, agregarAmigo, eliminarAmigo, eliminarEstudiante, listarEstudiantes, listarEstudiantesDesactivados, loginEstudiante, obtenerEstudiante, perfilEstudiante, reactivarEstudiante, registrarEstudiante, subirFotoPerfil } from '../controllers/estudiante_controller.js';
+import { actualizarEstudiante, actualizarPassword, agregarAmigo, eliminarAmigo, eliminarEstudiante, listarEstudiantes, listarEstudiantesDesactivados, loginEstudiante, obtenerEstudiante, perfilEstudiante, reactivarEstudiante, registrarEstudiante, subirFotoPerfil } from '../controllers/estudiante_controller.js';
 import { verificarAdmin } from '../middlewares/verificarAdmin.js';
 
 
@@ -19,6 +19,7 @@ router.delete("/estudiante/eliminar/:id", verificarAutenticacion,eliminarEstudia
 router.get("/estudiantes/desactivado/", verificarAutenticacion,verificarAdmin,listarEstudiantesDesactivados);
 router.put("/estudiante/reactivar/:id", verificarAutenticacion,verificarAdmin,reactivarEstudiante);
 
+router.put('/estudiante/actualizarpassword',verificarAutenticacion, actualizarPassword)
 router.post('/estudiante/:id/agregar', verificarAutenticacion, agregarAmigo);
 router.post('/estudiante/:id/eliminar', verificarAutenticacion, eliminarAmigo);
 

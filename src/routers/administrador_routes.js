@@ -27,7 +27,7 @@ router.post("/nuevo-password/:token", nuevoPassword);
 
 
 // Rutas privadas
-router.get("/perfil",verificarAutenticacion , perfil);
+router.get("/admin/perfil",verificarAutenticacion , perfil);
 router.put('/administrador/actualizarpassword',verificarAutenticacion, actualizarPassword)
 router.put("/administrador/:id", verificarAutenticacion, actualizarPerfil);
 

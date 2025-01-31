@@ -444,6 +444,30 @@ const eliminarAmigo = async (req, res) => {
     res.status(500).json({ mensaje: "Hubo un error al eliminar amigo", error });
   }
 };
+// Método para actualizar el password
+const actualizarPassword = async (req, res) => {
+  const estudianteBDD = await Estudiante.findById(
+    req.body._id
+  );
+
+  if (!estudianteBDD)
+    return res.status(404).json({ msg: "No existe el estudiante" });
+
+  const verificarPassword = await estudianteBDD.matchPassword(
+    req.body.passwordactual
+  );
+
+  if (!verificarPassword)
+    return res.status(404).json({ msg: "La contraseña actual no es correcta" });
+
+  estudianteBDD.password = await estudianteBDD.encrypPassword(
+    req.body.passwordnuevo
+  );
+
+  await estudianteBDD.save();
+
+  res.status(200).json({ msg: "Contraseña actualizada correctamente" });
+};
 export {
   loginEstudiante,
   perfilEstudiante,
@@ -456,5 +480,6 @@ export {
   subirFotoPerfil,
   agregarAmigo,
   eliminarAmigo,
-  listarEstudiantesDesactivados
+  listarEstudiantesDesactivados,
+  actualizarPassword
 };

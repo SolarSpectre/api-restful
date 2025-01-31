@@ -49,12 +49,16 @@ const login = async (req, res) => {
 
 // Método para mostrar el perfil
 const perfil = async (req, res) => {
-  const {idToken} = jwt.verify(req.headers.authorization.split(' ')[1],process.env.JWT_SECRET)
+  const {idToken,rol} = jwt.verify(req.headers.authorization.split(' ')[1],process.env.JWT_SECRET)
+  if (rol !== "Administrador")
+    return res
+      .status(404)
+      .json({ msg: "No tienes permisos para realizar esta acción" });
   const administradorBDD = await Administrador.findById(idToken).select(
     "-status -__v -token -updatedAt -createdAt"
   );
-
-  const { nombre, apellido, telefono, email, _id, rol, direccion,} = administradorBDD;
+  const token = generarJWT(administradorBDD._id, rol);
+  const { nombre, apellido, telefono, email, _id, direccion,} = administradorBDD;
 
   res.status(200).json({
     nombre,
@@ -63,6 +67,7 @@ const perfil = async (req, res) => {
     email,
     _id,
     rol,
+    token,
     direccion,
   });
 
