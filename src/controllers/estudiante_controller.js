@@ -258,7 +258,11 @@ const actualizarEstudiante = async (req, res) => {
       .status(404)
       .json({ msg: `Lo sentimos, no existe el estudiante con ID ${id}` });
   }
-
+  if(body.password){
+    return res
+      .status(400)
+      .json({ msg: `Lo sentimos, no se debe actualizar el password en este formulario` });
+  }
   try {
     const estudiante = await Estudiante.findById(id);
     if (!estudiante) {

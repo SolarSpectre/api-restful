@@ -150,6 +150,8 @@ const actualizarPerfil = async (req, res) => {
   administradorBDD.nombre = req.body.nombre || administradorBDD?.nombre;
   administradorBDD.apellido = req.body.apellido || administradorBDD?.apellido;
   administradorBDD.email = req.body.email || administradorBDD?.email;
+  administradorBDD.telefono = req.body.telefono || administradorBDD?.telefono;
+  administradorBDD.direccion = req.body.direccion || administradorBDD?.direccion;
 
   await administradorBDD.save();
 
