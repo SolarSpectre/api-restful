@@ -20,7 +20,7 @@ API para comunidades universitarias cercanas a la EPN (Escuela Politécnica Naci
 
 Estructura del proyecto
 
-![image](https://github.com/user-attachments/assets/8a71c12a-c936-4afe-b3ae-6fd06b0b68c5)
+![image](https://github.com/user-attachments/assets/778ebd53-32d0-431e-ab22-ecbf38ce4786)
 
 2. **Instalar dependencias**:
 ```bash
@@ -50,46 +50,56 @@ Modo desarrollo (con Nodemon):
     npm run dev
 ```
 ## Rutas de la API 🔌
-### Administrador 👨💼
-Método	Endpoint	Descripción
-POST	/api/registro	Registro de administrador.
-POST	/api/login	Inicio de sesión.
-GET	/api/admin/perfil Obtener perfil del administrador.
-PUT	/api/administrador/:id	Actualizar perfil.
-PUT	/api/administrador/actualizarpassword	Actualizar contraseña.
-POST	/api/recuperar-password Recuperar contraseña (envía correo).
-GET	/api/confirmar/:token	Confirmar email (vía token).
-### Estudiante 🎓
-Método	Endpoint	Descripción
-POST	/api/student/register	Registro de estudiante.
-POST	/api/student/login	Inicio de sesión.
-GET	/api/student/profile	Obtener perfil del estudiante.
-GET	/api/student/all	Listar todos los estudiantes.
-GET	/api/student/:id	Obtener estudiante por ID.
-PUT	/api/student/update	Actualizar perfil.
-DELETE	/api/student/delete	Eliminar cuenta.
-POST	/api/student/add-friend/:id	Agregar amigo.
-DELETE	/api/student/remove-friend/:id	Eliminar amigo.
-### Comunidades 🏛️
-Método	Endpoint	Descripción
-POST	/api/comunidades/	Crear comunidad.
-GET	/api/comunidades	Obtener todas las comunidades.
-GET	/api/comunidades/:id	Obtener comunidad por ID.
-PUT	/api/comunidades/:id	Actualizar comunidad.
-DELETE	/api/comunidades/:id	Eliminar comunidad.
-POST	/api/comunidades/:id/unirse	Unirse a una comunidad.
-### Comentarios 💬
-Método	Endpoint	Descripción
-POST	/api/comentarios/	Crear comentario.
-GET	/api/comentarios/:comunidadId	Obtener comentario por ID.
-PATCH	/api/comentarios/:id_comentario	Actualizar comentario.
-DELETE	/api/comentarios/:id_comentario Eliminar comentario.
-### Mensajes 📩
-Método	Endpoint	Descripción
-GET	/api/mensaje/usuarios	Listar usuarios conectados.
-GET	/api/mensaje/:id	Obtener historial de mensajes.
-POST /api/mensaje/enviar/:id Enviar mensajes
-WebSocket	/socket.io/	Enviar mensajes en tiempo real.
+## Administrador 👨💼
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| POST   | /api/registro | Registro de administrador. |
+| POST   | /api/login | Inicio de sesión. |
+| GET    | /api/admin/perfil | Obtener perfil del administrador. |
+| PUT    | /api/administrador/:id | Actualizar perfil. |
+| PUT    | /api/administrador/actualizarpassword | Actualizar contraseña. |
+| POST   | /api/recuperar-password | Recuperar contraseña (envía correo). |
+| GET    | /api/confirmar/:token | Confirmar email (vía token). |
+
+## Estudiante 🎓
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| POST   | /api/student/register | Registro de estudiante. |
+| POST   | /api/student/login | Inicio de sesión. |
+| GET    | /api/student/profile | Obtener perfil del estudiante. |
+| GET    | /api/student/all | Listar todos los estudiantes. |
+| GET    | /api/student/:id | Obtener estudiante por ID. |
+| PUT    | /api/student/update | Actualizar perfil. |
+| DELETE | /api/student/delete | Eliminar cuenta. |
+| POST   | /api/student/add-friend/:id | Agregar amigo. |
+| DELETE | /api/student/remove-friend/:id | Eliminar amigo. |
+
+## Comunidades 🏛️
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| POST   | /api/comunidades/ | Crear comunidad. |
+| GET    | /api/comunidades | Obtener todas las comunidades. |
+| GET    | /api/comunidades/:id | Obtener comunidad por ID. |
+| PUT    | /api/comunidades/:id | Actualizar comunidad. |
+| DELETE | /api/comunidades/:id | Eliminar comunidad. |
+| POST   | /api/comunidades/:id/unirse | Unirse a una comunidad. |
+
+## Comentarios 💬
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| POST   | /api/comentarios/ | Crear comentario. |
+| GET    | /api/comentarios/:comunidadId | Obtener comentario por ID. |
+| PATCH  | /api/comentarios/:id_comentario | Actualizar comentario. |
+| DELETE | /api/comentarios/:id_comentario | Eliminar comentario. |
+
+## Mensajes 📩
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| GET    | /api/mensaje/usuarios | Listar usuarios conectados. |
+| GET    | /api/mensaje/:id | Obtener historial de mensajes. |
+| POST   | /api/mensaje/enviar/:id | Enviar mensajes. |
+| WebSocket | /socket.io/ | Enviar mensajes en tiempo real. |
+
 ### Despliegue en Render 🚀
 
 La API está desplegada en Render.
