@@ -1,41 +1,118 @@
-Proyecto API Restful EXAMEN B1
-* Gestión de Información para estudiantes de universidades aledañas a la EPN
+# U-Connect API 📚
 
-Este proyecto implementa un sistema de CRUD (Crear, Leer, Actualizar y Eliminar) para gestionar la información relevante, tanto de las carreras en común que presentan las universidades como de los estudiantes. La aplicación está diseñada para ser desplegada en un entorno backend, facilitando la administración y manejo de datos predefinidos.
+API para comunidades universitarias cercanas a la EPN (Escuela Politécnica Nacional). Facilita la conexión entre estudiantes, gestión de comunidades, comentarios y mensajería en tiempo real.
 
-- Características Principales
+## Tecnologías Utilizadas 🛠️
 
-Gestión de comunidades y estudiantes: Crear, visualizar, editar y eliminar tanto comunidades respecto de sus carreras como estudiantes dentro del sistema.
+- **Express.js**: Framework para construir la API REST.
+- **JWT (JSON Web Tokens)**: Autenticación y autorización de usuarios.
+- **Nodemailer**: Envío de correos electrónicos (confirmación, recuperación de contraseña).
+- **MongoDB**: Base de datos NoSQL para almacenamiento de datos.
+- **Socket.IO**: Chat en tiempo real entre usuarios.
+- **Cloudinary**: Almacenamiento y gestión de imágenes de perfil.
 
-Base de Datos: Sistema relacional para almacenar y organizar la información.
+## Instalación 🚀
 
-API REST: Exposición de endpoints para operaciones CRUD.
-
-Despliegue: Preparado para implementación en plataformas de alojamiento como Render, Vercel, entre otras.
+1. **Clonar el repositorio**:
+   ```bash
+   git clone https://github.com/SolarSpectre/api-restful.git
+   cd u-connect-api.
 
 Estructura del proyecto
 
-![image](https://github.com/user-attachments/assets/8a71c12a-c936-4afe-b3ae-6fd06b0b68c5)
+![image](https://github.com/user-attachments/assets/778ebd53-32d0-431e-ab22-ecbf38ce4786)
 
-- Herramientas
-El proyecto fue realizado con las siguientes herramientas:
-Express.js, Librerias NPM, Render, Beeceptor, Git y GitHub, Cloudinary e Imsomnia
+2. **Instalar dependencias**:
+```bash
+    npm install
+```
+3. **Configurar variables de entorno**:
+Crea un archivo .env en la raíz del proyecto con las siguientes variables:
+```env
+    MONGODB_URI=tu_url_de_mongodb
+    CLOUDINARY_CLOUD_NAME=tu_cloud_name
+    CLOUDINARY_API_KEY=tu_api_key
+    CLOUDINARY_API_SECRET=tu_api_secret
+    JWT_SECRET=tu_secreto_jwt
+    URL_FRONTEND=http://localhost:3000  # URL del frontend
+    # Configuración de Mailtrap (pruebas de correo)
+    HOST_MAILTRAP=smtp.mailtrap.io
+    PORT_MAILTRAP=2525
+    USER_MAILTRAP=tu_usuario_mailtrap
+    PASS_MAILTRAP=tu_contraseña_mailtrap
+```
+4. **Ejecutar el servidor**:
+```bash
+    npm start
+```
+Modo desarrollo (con Nodemon):
+```bash
+    npm run dev
+```
+## Rutas de la API 🔌
+## Administrador 👨💼
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| POST   | /api/registro | Registro de administrador. |
+| POST   | /api/login | Inicio de sesión. |
+| GET    | /api/admin/perfil | Obtener perfil del administrador. |
+| PUT    | /api/administrador/:id | Actualizar perfil. |
+| PUT    | /api/administrador/actualizarpassword | Actualizar contraseña. |
+| POST   | /api/recuperar-password | Recuperar contraseña (envía correo). |
+| GET    | /api/confirmar/:token | Confirmar email (vía token). |
 
-- Instrucciones de Uso
-1. Clonar el Repositorio
-2. Instalar dependencias: npm install
-3. Configurar el Entorno: Crear un archivo .env con las siguientes variables:
+## Estudiante 🎓
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| POST   | /api/student/register | Registro de estudiante. |
+| POST   | /api/student/login | Inicio de sesión. |
+| GET    | /api/student/profile | Obtener perfil del estudiante. |
+| GET    | /api/student/all | Listar todos los estudiantes. |
+| GET    | /api/student/:id | Obtener estudiante por ID. |
+| PUT    | /api/student/update | Actualizar perfil. |
+| DELETE | /api/student/delete | Eliminar cuenta. |
+| POST   | /api/student/add-friend/:id | Agregar amigo. |
+| DELETE | /api/student/remove-friend/:id | Eliminar amigo. |
 
-3.1. CLOUDINARY_CLOUD_NAME
+## Comunidades 🏛️
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| POST   | /api/comunidades/ | Crear comunidad. |
+| GET    | /api/comunidades | Obtener todas las comunidades. |
+| GET    | /api/comunidades/:id | Obtener comunidad por ID. |
+| PUT    | /api/comunidades/:id | Actualizar comunidad. |
+| DELETE | /api/comunidades/:id | Eliminar comunidad. |
+| POST   | /api/comunidades/:id/unirse | Unirse a una comunidad. |
 
-3.2. CLOUDINARY_API_KEY
+## Comentarios 💬
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| POST   | /api/comentarios/ | Crear comentario. |
+| GET    | /api/comentarios/:comunidadId | Obtener comentario por ID. |
+| PATCH  | /api/comentarios/:id_comentario | Actualizar comentario. |
+| DELETE | /api/comentarios/:id_comentario | Eliminar comentario. |
 
-3.3. CLOUDINARY_API_SECRET
+## Mensajes 📩
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| GET    | /api/mensaje/usuarios | Listar usuarios conectados. |
+| GET    | /api/mensaje/:id | Obtener historial de mensajes. |
+| POST   | /api/mensaje/enviar/:id | Enviar mensajes. |
+| WebSocket | /socket.io/ | Enviar mensajes en tiempo real. |
 
-3.4. URL_BDD_TOURS
+### Despliegue en Render 🚀
 
-3.5. URL_BDD_USERS
+La API está desplegada en Render.
+URL de producción: https://api-restful-iul9.onrender.com
+**Pasos para despliegue**:
 
-- Autores
+- Conectar repositorio de GitHub a Render.
+- Configurar variables de entorno en el dashboard de Render.
+- Especificar el comando de inicio: npm start.
+- ¡Desplegar!
+
+
+
+## Contribuidores ✨
 
 Marlon Nicolalde, Joseph Caza, Michelle Suárez e Isaac Quinapallo
