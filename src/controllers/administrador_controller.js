@@ -131,7 +131,7 @@ const actualizarPerfil = async (req, res) => {
 
   if (Object.values(req.body).includes(""))
     return res.status(400).json({ msg: "Debes llenar todos los campos" });
-  if(body.password){
+  if(req.body.password){
     return res
       .status(400)
       .json({ msg: `Lo sentimos, no se debe actualizar el password en este formulario` });
