@@ -1,12 +1,27 @@
 import jwt from "jsonwebtoken";
 import Comentario from "../models/Comentario.js";
+import mongoose from "mongoose";
 
 // Obtener todos los comentarios con los campos específicos
 export const getAllComments = async (req, res) => {
   try {
-    const comentarios = await Comentario.find()
-      .populate("comunidad", "_id") // Solo traer el ID de la comunidad
-      .populate("usuario", "_id fotoPerfil usuario"); // Solo traer los campos deseados del usuario
+    const { comunidadId } = req.params;
+
+    // Validar que se proporcione el ID de la comunidad
+    if (!comunidadId) {
+      return res.status(400).json({ error: "Se requiere el ID de la comunidad" });
+    }
+
+    // Validar formato del ID
+    if (!mongoose.Types.ObjectId.isValid(comunidadId)) {
+      return res.status(400).json({ error: "ID de comunidad no válido" });
+    }
+
+    // Buscar comentarios con el filtro de comunidad
+    const comentarios = await Comentario.find({ comunidad: comunidadId })
+  .populate("replyTo", "usuario comentario")
+  .populate("usuario", "_id fotoPerfil usuario")
+  .populate("comunidad", "_id");
 
     res.status(200).json(comentarios);
   } catch (error) {
@@ -14,42 +29,31 @@ export const getAllComments = async (req, res) => {
   }
 };
 
-// Obtener un comentario por ID
-export const getCommentById = async (req, res) => {
-  try {
-    const { id_comentario } = req.params;
-    const comentario = await Comentario.findById(id_comentario)
-      .populate("comunidad", "_id")
-      .populate("usuario", "_id fotoPerfil usuario");
-
-    if (!comentario) {
-      return res.status(404).json({ error: "Comentario no encontrado" });
-    }
-
-    res.status(200).json(comentario);
-  } catch (error) {
-    res.status(500).json({ error: "Error al buscar el comentario" });
-  }
-};
-
 // Crear un nuevo comentario
 export const createComment = async (req, res) => {
   try {
-    const { comunidad, usuario, comentario } = req.body;
+    const { comunidad, usuario, comentario, replyTo } = req.body;
 
-    if (Object.values(req.body).includes("")) {
-      return res
-        .status(400)
-        .json({ msg: "Lo sentimos, debes llenar todos los campos" });
+    // Validar replyTo si existe
+    if (replyTo && !mongoose.Types.ObjectId.isValid(replyTo)) {
+      return res.status(400).json({ error: "ID de comentario padre no válido" });
     }
+
     const nuevoComentario = new Comentario({
       comunidad,
       usuario,
       comentario,
+      replyTo
     });
 
     await nuevoComentario.save();
-    res.status(201).json(nuevoComentario);
+    
+    // Populate del comentario padre
+    const populatedComment = await Comentario.findById(nuevoComentario._id)
+      .populate("replyTo", "usuario comentario")
+      .populate("usuario", "_id fotoPerfil usuario");
+
+    res.status(201).json(populatedComment);
   } catch (error) {
     res.status(500).json({ error: "Error al crear el comentario" });
   }
@@ -93,18 +97,24 @@ export const deleteComment = async (req, res) => {
     const { id_comentario } = req.params;
     const {idToken,rol} = jwt.verify(req.headers.authorization.split(' ')[1],process.env.JWT_SECRET)
 
-    // Buscar el comentario
+    // Buscar y validar comentario
     const existingComment = await Comentario.findById(id_comentario);
-    if (!existingComment) {
-      return res.status(404).json({ error: "Comentario no encontrado" });
-    }
+    if (!existingComment) return res.status(404).json({ error: "Comentario no encontrado" });
 
-    // Verificar si el usuario es el dueño del comentario o es un administrador
+    // Verificar permisos
     if (existingComment.usuario.toString() !== idToken && rol !== "Administrador") {
       return res.status(403).json({ error: "No tienes permiso para eliminar este comentario" });
     }
 
-    // Eliminar el comentario
+    // Actualizar todos los comentarios que eran respuestas a este
+    await Comentario.updateMany(
+      { replyTo: id_comentario },
+      { 
+        $set: { 
+          isDeletedParent: true
+        } 
+      }
+    );
     await existingComment.deleteOne();
 
     res.status(200).json({ message: "Comentario eliminado correctamente" });

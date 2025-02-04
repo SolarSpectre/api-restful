@@ -18,6 +18,15 @@ const comentarioSchema = new Schema({
   fecha_creacion: {
     type: Date,
     default: Date.now // Fecha automática de creación
+  },
+  replyTo: {
+    type: Schema.Types.ObjectId,
+    ref: 'Comentario',
+    default: null
+  },
+  isDeletedParent: {
+    type: Boolean,
+    default: false
   }
 });
 

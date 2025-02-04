@@ -4,7 +4,7 @@ import express from "express";
 
 const app = express();
 const server = http.createServer(app);
-const allowedOrigins = [process.env.URL_FRONTEND];
+const allowedOrigins = [process.env.URL_FRONTEND,'http://localhost:5173/'];
 
 const io = new Server(server, {
   cors: {
