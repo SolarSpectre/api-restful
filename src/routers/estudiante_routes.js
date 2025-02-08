@@ -10,7 +10,7 @@ import { verificarAdmin } from '../middlewares/verificarAdmin.js';
 router.post('/estudiante/login',loginEstudiante)
 
 router.get('/estudiante/perfil',verificarAutenticacion,perfilEstudiante)
-router.get("/estudiantes",verificarAutenticacion,listarEstudiantes);
+router.get("/estudiantes",verificarAutenticacion,verificarAdmin,listarEstudiantes);
 router.get("/estudiante/:id",verificarAutenticacion, obtenerEstudiante);
 router.post("/estudiante/registro", subirFotoPerfil, registrarEstudiante);
 router.put("/estudiante/actualizar/:id", verificarAutenticacion,subirFotoPerfil,actualizarEstudiante);
