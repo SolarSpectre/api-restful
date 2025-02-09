@@ -11,7 +11,7 @@ import connection from "./database.js";
 
 dotenv.config(); // Configurations
 app.set("port", process.env.PORT || 3000);
-const allowedOrigins = [process.env.URL_FRONTEND, 'http://localhost:5173/', 'https://u-connect-epn.vercel.app'];
+const allowedOrigins = [process.env.URL_FRONTEND, 'http://localhost:5173', 'https://u-connect-epn.vercel.app'];
 
 app.use(
   cors({
