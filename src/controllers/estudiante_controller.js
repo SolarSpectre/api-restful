@@ -272,7 +272,7 @@ const actualizarEstudiante = async (req, res) => {
     if (estudiante._id.toString() !== idToken && rol !== "Administrador") {
       return res
         .status(403)
-        .json({ error: "No tienes permiso para actualizar esta cuenta" });
+        .json({ msg: "No tienes permiso para actualizar esta cuenta" });
     }
     // Si hay una imagen nueva, subirla a Cloudinary
     if (file) {
@@ -328,7 +328,7 @@ const eliminarEstudiante = async (req, res) => {
     if (estudiante._id.toString() !== idToken && rol !== "Administrador") {
       return res
         .status(403)
-        .json({ error: "No tienes permiso para actualizar esta cuenta" });
+        .json({ msg: "No tienes permiso para actualizar esta cuenta" });
     }
     // Eliminar la imagen de Cloudinary si existe
     if (estudiante.fotoPerfil?.public_id) {
