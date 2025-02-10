@@ -5,6 +5,7 @@ import jwt from "jsonwebtoken";
 import fs from "fs-extra";
 import path from "path";
 import { sendMailToEstudiante } from "../config/nodemailer.js";
+import cloudinary from "../config/cloudinary.js";
 
 import mongoose from "mongoose";
 import generarJWT from "../helpers/crearJWT.js";
@@ -259,11 +260,9 @@ const actualizarEstudiante = async (req, res) => {
       .json({ msg: `Lo sentimos, no existe el estudiante con ID ${id}` });
   }
   if (body.password) {
-    return res
-      .status(400)
-      .json({
-        msg: `Lo sentimos, no se debe actualizar el password en este formulario`,
-      });
+    return res.status(400).json({
+      msg: `Lo sentimos, no se debe actualizar el password en este formulario`,
+    });
   }
   try {
     const estudiante = await Estudiante.findById(id);
@@ -296,23 +295,25 @@ const actualizarEstudiante = async (req, res) => {
       };
       await fs.remove(uploadDir);
     }
-
     // Actualizar el estudiante con los nuevos datos
-    estudiante.nombre = req.body.nombre || estudiante?.nombre;
-    estudiante.usuario = req.body.usuario || estudiante?.usuario;
-    estudiante.email = req.body.email || estudiante?.email;
-    estudiante.celular = req.body.celular || estudiante?.celular;
-    estudiante.intereses = req.body.intereses || estudiante?.intereses;
-    estudiante.bio = req.body.bio || estudiante?.bio;
-    estudiante.fotoPerfil = req.body.fotoPerfil || estudiante?.fotoPerfil;
+    estudiante.nombre = body.nombre || estudiante?.nombre;
+    estudiante.usuario = body.usuario || estudiante?.usuario;
+    estudiante.email = body.email || estudiante?.email;
+    estudiante.celular = body.celular || estudiante?.celular;
+    estudiante.intereses = body.intereses
+      ? JSON.parse(body.intereses)
+      : estudiante?.intereses;
+    estudiante.bio = body.bio || estudiante?.bio;
 
+    if (typeof body.fotoPerfil === "object" && body.fotoPerfil !== null) {
+      estudiante.fotoPerfil = body.fotoPerfil;
+    }
     await estudiante.save();
-    res
-      .status(200)
-      .json({ msg: "Perfil actualizado correctamente" });
+    res.status(200).json({ msg: "Perfil actualizado correctamente" });
   } catch (error) {
     await fs.remove(uploadDir);
-    res.status(500).json({ msg: "Hubo un error en el servidor"});
+    res.status(500).json({ msg: "Hubo un error en el servidor" });
+    console.log(error);
   }
 };
 
