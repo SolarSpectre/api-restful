@@ -25,7 +25,7 @@ const sendMailToUser = (userMail, token) => {
                 <h2 style="color: #2c3e50;">Verificación de Cuenta</h2>
                 <p>Hola,</p>
                 <p>Para confirmar tu cuenta, haz clic en el siguiente botón:</p>
-                <a href="${process.env.URL_FRONTEND}confirmar/${encodeURIComponent(token)}" 
+                <a href="${process.env.URL_FRONTEND}/confirmar/${encodeURIComponent(token)}" 
                    style="display: inline-block; padding: 10px 20px; background-color: #3498db; color: white; text-decoration: none; border-radius: 5px;">
                    Verificar Cuenta
                 </a>
@@ -47,7 +47,7 @@ const sendMailToUser = (userMail, token) => {
 // Correo de recuperación de contraseña
 const sendMailToRecoveryPassword = async(userMail, token) => {
     let info = await transporter.sendMail({
-        from: 'admin@uconnect.com',
+        from: process.env.USER_MAILTRAP,
         to: userMail,
         subject: "Recuperación de Contraseña - UConnect",
         html: `
@@ -57,7 +57,7 @@ const sendMailToRecoveryPassword = async(userMail, token) => {
                 <p>Hola,</p>
                 <p>Hemos recibido una solicitud para restablecer tu contraseña en UConnect.</p>
                 <p>Haz clic en el siguiente botón para continuar con el proceso:</p>
-                <a href="${process.env.URL_FRONTEND}recuperar-password/${token}" 
+                <a href="${process.env.URL_FRONTEND}/recuperar-password/${token}" 
                    style="display: inline-block; padding: 10px 20px; background-color: #e74c3c; color: white; text-decoration: none; border-radius: 5px;">
                    Restablecer Contraseña
                 </a>
@@ -75,7 +75,7 @@ const sendMailToRecoveryPassword = async(userMail, token) => {
 // Correo de bienvenida a estudiantes (Uni-Connect)
 const sendMailToEstudiante = async (userMail, password) => {
     let info = await transporter.sendMail({
-        from: 'admin@universidades.com',
+        from: process.env.USER_MAILTRAP,
         to: userMail,
         subject: "Bienvenido a la Comunidad Universitaria 🎓",
         html: `
@@ -90,7 +90,7 @@ const sendMailToEstudiante = async (userMail, password) => {
                     <li><strong>Contraseña:</strong> ${password}</li>
                 </ul>
                 <p>Para iniciar sesión, haz clic en el siguiente botón:</p>
-                <a href="${process.env.URL_FRONTEND}login" 
+                <a href="${process.env.URL_FRONTEND}/login" 
                    style="display: inline-block; padding: 10px 20px; background-color: #3498db; color: white; text-decoration: none; border-radius: 5px;">
                    Iniciar sesión
                 </a>

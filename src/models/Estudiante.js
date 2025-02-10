@@ -59,14 +59,20 @@ const estudianteSchema = new Schema(
       type: Boolean,
       default: true, // Indica si la cuenta está activa
     },
+    token: {
+      type: String,
+      default: null,
+    },
     rol: {
       type: String,
       default: "Estudiante",
     },
-    amigos: [{
-      type: Schema.Types.ObjectId,
-      ref: 'Estudiante',
-    }],
+    amigos: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Estudiante",
+      },
+    ],
   },
   {
     timestamps: true,
@@ -84,6 +90,10 @@ estudianteSchema.methods.encrypPassword = async function (password) {
 estudianteSchema.methods.matchPassword = async function (password) {
   const response = await bcrypt.compare(password, this.password);
   return response;
+};
+estudianteSchema.methods.crearToken = function () {
+  const tokenGenerado = this.token = Math.random().toString(36).slice(2);
+  return tokenGenerado;
 };
 
 export default model("Estudiante", estudianteSchema);
